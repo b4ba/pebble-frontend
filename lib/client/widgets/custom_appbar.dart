@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // Appbar of the app
-class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
   final bool back;
@@ -25,7 +25,10 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
         style: TextStyle(fontWeight: FontWeight.w700, color: Colors.black),
       ),
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20))),
       toolbarHeight: 100,
       leadingWidth: 100,
       shadowColor: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
@@ -35,7 +38,8 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
           ? InkWell(
               onTap: () => confirmBackPressed(disableBackGuard, context),
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 25.0, vertical: 15.0),
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
