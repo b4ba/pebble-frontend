@@ -140,22 +140,22 @@ class GraphElection extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             ),
           ),
-          Row(
-            children: const [
+          const Row(
+            children: [
               Icon(Icons.circle, color: Colors.blue),
               SizedBox(width: 10),
               Text('James Cameron'),
             ],
           ),
-          Row(
-            children: const [
+          const Row(
+            children: [
               Icon(Icons.circle, color: Colors.red),
               SizedBox(width: 10),
               Text('Susan Matthew'),
             ],
           ),
-          Row(
-            children: const [
+          const Row(
+            children: [
               Icon(Icons.circle, color: Colors.orange),
               SizedBox(width: 10),
               Text('Yanning Li'),

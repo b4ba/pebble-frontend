@@ -34,9 +34,9 @@ class _WelcomeState extends State<Welcome> with TickerProviderStateMixin {
       body: Center(
         child: FadeTransition(
           opacity: _animation,
-          child: Column(
+          child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Text('Welcome to'),
               Icon(Icons.how_to_vote, size: 100),
               Text(

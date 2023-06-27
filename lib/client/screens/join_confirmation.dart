@@ -88,10 +88,10 @@ class JoinElectionConfirmation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: const [
+      children: [
         Text(
           'You are joining the election:',
           textAlign: TextAlign.center,
@@ -130,10 +130,10 @@ class JoinOrganizationConfirmation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: const [
+      children: [
         Text(
           'You are joining the organization:',
           textAlign: TextAlign.center,
