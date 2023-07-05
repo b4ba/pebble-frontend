@@ -46,6 +46,13 @@ dependencies:
   mobile_scanner: ^2.1.0
   http: ^1.1.0
   flutter_secure_storage: ^8.0.0
+  crypto: ^3.0.3
+  test: ^1.24.1
+  collection: any
+  pointycastle: ^3.7.3
+  tezart: ^2.0.5
+  cryptography_flutter: ^2.3.0
+  cryptography: ^3.0.0
 
 dev_dependencies:
   flutter_test:
