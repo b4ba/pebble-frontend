@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'dart:convert';
 
 // Screen to use camera to scan QR code to
 // either join an organization or an election.
@@ -62,7 +63,8 @@ class _JoinCameraState extends State<JoinCamera> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(back: true, disableBackGuard: true, disableMenu: false),
+      appBar: const CustomAppBar(
+          back: true, disableBackGuard: true, disableMenu: false),
       endDrawer: const CustomDrawer(),
       body: Stack(
         alignment: Alignment.center,
@@ -71,36 +73,84 @@ class _JoinCameraState extends State<JoinCamera> {
             allowDuplicates: false,
             controller: cameraController,
             onDetect: (barcode, args) {
-              String code = barcode.rawValue ?? "---";
+              try {
+                String code = barcode.rawValue ?? "---";
 
-              setState(() {
-                _fetching = true;
-              });
+                // Parse the raw value as JSON
+                Map<String, dynamic> data = jsonDecode(code);
 
-              if (widget.isElection && code == "joinElection") {
-                Future.delayed(const Duration(seconds: 3), () {
-                  // TODO: Implementation for joining election
-                  context.go('/register-election/confirmation');
+                setState(() {
+                  _fetching = true;
                 });
-              } else if (!widget.isElection && code == "joinOrganization") {
-                Future.delayed(const Duration(seconds: 3), () {
-                  // TODO: Implementation for joining organization
-                  context.go('/register-organization/confirmation');
-                });
-              } else {
-                Future.delayed(const Duration(seconds: 3), () {
-                  setState(() {
-                    _fetching = false;
-                    _scannedString = "Invalid QR code. Please try another one";
-                    _visible = true;
+
+                // Check if the JSON contains an 'invitationID' key
+                if (data.containsKey('invitationID')) {
+                  // Extract the invitationID
+                  String invitationID = data['invitationID'];
+
+                  // Proceed with registering for an invitation
+                  Future.delayed(const Duration(seconds: 3), () {
+                    // TODO: Implementation for joining election <-- ADD HERE THE LOGIC FOR JOINING ELECTION
+                    context.go('/register-election/confirmation');
                   });
 
+                  // Check if the JSON contains an 'organizationID' key
+                } else if (data.containsKey('organizationID')) {
+                  // Extract the organizationID
+                  String organizationID = data['organizationID'];
+
+                  // Proceed with registering with the organization
+                  Future.delayed(const Duration(seconds: 3), () {
+                    // TODO: Implementation for joining organization <-- ADD HERE THE LOGIC FOR JOINING ORGANIZATION
+                    context.go('/register-organization/confirmation');
+                  });
+                } else {
+                  // Handle the case where the JSON does not contain either key
                   Future.delayed(const Duration(seconds: 3), () {
                     setState(() {
-                      _visible = false;
+                      _fetching = false;
+                      _scannedString =
+                          "Invalid QR code. Please try another one";
+                      _visible = true;
+                    });
+
+                    Future.delayed(const Duration(seconds: 3), () {
+                      setState(() {
+                        _visible = false;
+                      });
                     });
                   });
-                });
+                }
+
+                // if (widget.isElection && code == "joinElection") {
+                //   Future.delayed(const Duration(seconds: 3), () {
+                //     // TODO: Implementation for joining election
+                //     context.go('/register-election/confirmation');
+                //   });
+                // } else if (!widget.isElection && code == "joinOrganization") {
+                //   Future.delayed(const Duration(seconds: 3), () {
+                //     // TODO: Implementation for joining organization
+                //     context.go('/register-organization/confirmation');
+                //   });
+                // } else {
+                //   Future.delayed(const Duration(seconds: 3), () {
+                //     setState(() {
+                //       _fetching = false;
+                //       _scannedString =
+                //           "Invalid QR code. Please try another one";
+                //       _visible = true;
+                //     });
+
+                //     Future.delayed(const Duration(seconds: 3), () {
+                //       setState(() {
+                //         _visible = false;
+                //       });
+                //     });
+                //   });
+                // }
+              } catch (e) {
+                // Handle any errors that occur during the JSON parsing process
+                print('Error parsing QR code: $e');
               }
             },
           ),
@@ -138,6 +188,7 @@ class _JoinCameraState extends State<JoinCamera> {
   }
 }
 
-String _foundBarcode(Barcode barcode, MobileScannerArguments? args, BuildContext context) {
+String _foundBarcode(
+    Barcode barcode, MobileScannerArguments? args, BuildContext context) {
   return barcode.rawValue ?? "---";
 }
