@@ -11,7 +11,14 @@ class Election extends Equatable {
   final DateTime endTime;
   final List<Choice> choices;
 
-  const Election({required this.id, required this.title, required this.description, required this.organization, required this.startTime, required this.endTime, required this.choices});
+  const Election(
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.organization,
+      required this.startTime,
+      required this.endTime,
+      required this.choices});
 
   @override
   List<Object?> get props => [id, title];
@@ -31,7 +38,8 @@ class Election extends Equatable {
     Election(
       id: '1',
       title: 'Best food (April)',
-      description: 'Voters will vote for their favorite dish from a selection of options. They will be presented to the voters and they will have to decide which one they like the most for the month of April.',
+      description:
+          'Voters will vote for their favorite dish from a selection of options. They will be presented to the voters and they will have to decide which one they like the most for the month of April.',
       organization: 'Edinburgh Baking Society',
       startTime: DateTime.parse("2022-04-10"),
       endTime: DateTime.parse("2022-04-23"),
@@ -40,7 +48,8 @@ class Election extends Equatable {
     Election(
       id: '2',
       title: 'Social Meetup for the first time in a while (Dec)',
-      description: 'It has been a while since we hangout as a club. Come and vote for the place where we can hangout and catch-up!',
+      description:
+          'It has been a while since we hangout as a club. Come and vote for the place where we can hangout and catch-up!',
       organization: 'Informatics 19/23',
       startTime: DateTime.parse("2022-04-15"),
       endTime: DateTime.parse("2022-04-25"),
@@ -49,7 +58,8 @@ class Election extends Equatable {
     Election(
       id: '3',
       title: 'New pet name for the club?',
-      description: 'A member of the club found a cute stray dog and was thinking of making it the club\'s pet. What should we name it?',
+      description:
+          'A member of the club found a cute stray dog and was thinking of making it the club\'s pet. What should we name it?',
       organization: 'Informatics 19/23',
       startTime: DateTime.parse("2022-04-15"),
       endTime: DateTime.parse("2022-04-25"),
@@ -58,11 +68,40 @@ class Election extends Equatable {
     Election(
       id: '4',
       title: 'Club socials',
-      description: 'It\'s our monthly socials again! What should we do for this month of February?',
+      description:
+          'It\'s our monthly socials again! What should we do for this month of February?',
       organization: 'Edinburgh Baking Society',
       startTime: DateTime.parse("2023-02-15"),
       endTime: DateTime.parse("2023-02-25"),
       choices: Choice.pubChoice,
     )
   ];
+
+  factory Election.fromJson(Map<String, dynamic> json) {
+    List<dynamic> choicesJson = json['choices'];
+    List<Choice> choices =
+        choicesJson.map((choice) => Choice.fromJson(choice)).toList();
+
+    return Election(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      organization: json['organization'],
+      startTime: DateTime.parse(json['startTime']),
+      endTime: DateTime.parse(json['endTime']),
+      choices: choices,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'organization': organization,
+      'startTime': startTime.toIso8601String(),
+      'endTime': endTime.toIso8601String(),
+      'choices': choices.map((choice) => choice.toJson()).toList(),
+    };
+  }
 }
