@@ -1,5 +1,68 @@
 import 'package:ecclesia_ui/data/models/choice_model.dart';
+import 'package:ecclesia_ui/services/getElectionStatus.dart';
 import 'package:equatable/equatable.dart';
+
+import 'package:flutter/material.dart';
+
+// Constants to represent the phase of an election
+enum ElectionStatusEnum {
+  voteNotOpen,
+  voteOpen,
+  voteEnding,
+  voteClosed,
+  voted,
+}
+
+class ElectionCardModel {
+  final String statusTitle;
+  final Color color;
+  final String statusDesc;
+  final String subtitle;
+  final IconData icon;
+
+  ElectionCardModel({
+    required this.statusTitle,
+    required this.statusDesc,
+    required this.color,
+    required this.subtitle,
+    required this.icon,
+  });
+}
+
+final Map<ElectionStatusEnum, ElectionCardModel> electionCardOptions = {
+  ElectionStatusEnum.voteNotOpen: ElectionCardModel(
+      statusTitle: 'Not open yet',
+      color: Colors.orange,
+      statusDesc: "Election not ready yet",
+      subtitle: "Wait for the election to open.",
+      icon: Icons.error),
+  ElectionStatusEnum.voteOpen: ElectionCardModel(
+      statusTitle: 'Open to vote',
+      color: Colors.green,
+      statusDesc: "You can start voting now",
+      subtitle:
+          "Start voting by clicking the blue button at the bottom of the screen.",
+      icon: Icons.dangerous_rounded),
+  ElectionStatusEnum.voteEnding: ElectionCardModel(
+      statusTitle: 'Ending in 5 hours',
+      color: Colors.red,
+      statusDesc: "Vote before the election ends",
+      subtitle:
+          "Start voting by clicking the blue button at the bottom of the page.",
+      icon: Icons.pending_actions_rounded),
+  ElectionStatusEnum.voteClosed: ElectionCardModel(
+      statusTitle: 'Voting closed',
+      color: Colors.black,
+      statusDesc: "Voting period has ended",
+      subtitle: "Thank you for joining.",
+      icon: Icons.door_front_door_outlined),
+  ElectionStatusEnum.voted: ElectionCardModel(
+      statusTitle: 'You have voted',
+      color: Colors.blue,
+      statusDesc: "You have voted",
+      subtitle: "Wait for the voting period to end to see the result.",
+      icon: Icons.check_circle),
+};
 
 // Class model of an election
 class Election extends Equatable {
@@ -10,6 +73,7 @@ class Election extends Equatable {
   final DateTime startTime;
   final DateTime endTime;
   final List<Choice> choices;
+  final ElectionStatusEnum status; // Updated to include status property
 
   const Election(
       {required this.id,
@@ -18,7 +82,8 @@ class Election extends Equatable {
       required this.organization,
       required this.startTime,
       required this.endTime,
-      required this.choices});
+      required this.choices,
+      required this.status});
 
   @override
   List<Object?> get props => [id, title];
@@ -34,6 +99,7 @@ class Election extends Equatable {
       startTime: DateTime.parse("2022-02-23"),
       endTime: DateTime.parse("2022-03-23"),
       choices: Choice.personChoice,
+      status: ElectionStatusEnum.voteOpen,
     ),
     Election(
       id: '1',
@@ -44,6 +110,7 @@ class Election extends Equatable {
       startTime: DateTime.parse("2022-04-10"),
       endTime: DateTime.parse("2022-04-23"),
       choices: Choice.foodChoice,
+      status: ElectionStatusEnum.voteEnding,
     ),
     Election(
       id: '2',
@@ -54,6 +121,7 @@ class Election extends Equatable {
       startTime: DateTime.parse("2022-04-15"),
       endTime: DateTime.parse("2022-04-25"),
       choices: Choice.personChoice,
+      status: ElectionStatusEnum.voteClosed,
     ),
     Election(
       id: '3',
@@ -64,6 +132,7 @@ class Election extends Equatable {
       startTime: DateTime.parse("2022-04-15"),
       endTime: DateTime.parse("2022-04-25"),
       choices: Choice.personChoice,
+      status: ElectionStatusEnum.voted,
     ),
     Election(
       id: '4',
@@ -74,6 +143,7 @@ class Election extends Equatable {
       startTime: DateTime.parse("2023-02-15"),
       endTime: DateTime.parse("2023-02-25"),
       choices: Choice.pubChoice,
+      status: ElectionStatusEnum.voteNotOpen,
     )
   ];
 
@@ -81,6 +151,9 @@ class Election extends Equatable {
     List<dynamic> choicesJson = json['choices'];
     List<Choice> choices =
         choicesJson.map((choice) => Choice.fromJson(choice)).toList();
+
+    ElectionStatusEnum thisElecStatus = getElectionStatus(
+        DateTime.parse(json['startTime']), DateTime.parse(json['endTime']));
 
     return Election(
       id: json['id'],
@@ -90,6 +163,7 @@ class Election extends Equatable {
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
       choices: choices,
+      status: thisElecStatus,
     );
   }
 

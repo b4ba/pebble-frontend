@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
+import 'package:ecclesia_ui/services/getElectionStatus.dart';
 import 'package:ecclesia_ui/services/secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -42,6 +43,12 @@ class _JoinMethodState extends State<JoinMethod> {
     setState(() {
       _image = image;
     });
+  }
+
+  int choiceId = 0;
+
+  int _getChoiceId() {
+    return choiceId + 1;
   }
 
   @override
@@ -152,12 +159,15 @@ class _JoinMethodState extends State<JoinMethod> {
 
                               List<Choice> choices = data['choices']
                                   .map<Choice>((choice) => Choice(
-                                        id: '',
+                                        id: _getChoiceId().toString(),
                                         title: choice.toString(),
                                         description: '$choice description',
-                                        numberOfVote: 0,
+                                        numberOfVote:
+                                            0, //currently api doesn't send vote count when joining or fetching election info ¯\_(ツ)_/¯
                                       ))
                                   .toList();
+
+                              choiceId = 0;
 
                               final elec = Election(
                                   id: '',
@@ -166,7 +176,10 @@ class _JoinMethodState extends State<JoinMethod> {
                                   organization: 'organization',
                                   startTime: format.parse((data['castStart'])),
                                   endTime: format.parse((data['tallyStart'])),
-                                  choices: choices);
+                                  choices: choices,
+                                  status: getElectionStatus(
+                                      format.parse(data['castStart']),
+                                      format.parse(data['tallyStart'])));
 
                               storeSecureJson('electionToJoin', elec.toJson());
                               storeSecure('electionToJoinKey', inputCode);

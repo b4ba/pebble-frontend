@@ -1,5 +1,5 @@
 import 'package:ecclesia_ui/client/widgets/status_tag.dart';
-import 'package:ecclesia_ui/data/models/election_status_model.dart';
+import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,7 +39,8 @@ class ElectionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.0),
           boxShadow: [
             BoxShadow(
-                color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.14), //color of shadow
+                color: const Color.fromARGB(255, 0, 0, 0)
+                    .withOpacity(0.14), //color of shadow
                 spreadRadius: 0, //spread radius
                 blurRadius: 10, // blur radius
                 offset: const Offset(0, 4)),
@@ -71,7 +72,9 @@ class ElectionCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 5),
-            Text(electionOrganization, style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 12)),
+            Text(electionOrganization,
+                style:
+                    const TextStyle(fontStyle: FontStyle.italic, fontSize: 12)),
             // Link to see result
             // Render only when vote has been closed
             (status != ElectionStatusEnum.voteClosed)
@@ -80,7 +83,8 @@ class ElectionCard extends StatelessWidget {
                     height: 25,
                     child: TextButton(
                         style: ButtonStyle(
-                          padding: MaterialStateProperty.all<EdgeInsets>(const EdgeInsets.all(0)),
+                          padding: MaterialStateProperty.all<EdgeInsets>(
+                              const EdgeInsets.all(0)),
                         ),
                         onPressed: () {
                           context.go('/election-detail/$id/$userId/result');
@@ -97,7 +101,10 @@ class ElectionCard extends StatelessWidget {
               height: 5,
             ),
             // Election description
-            Text(electionDescription, overflow: TextOverflow.ellipsis, maxLines: 2, style: const TextStyle(fontSize: 12)),
+            Text(electionDescription,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                style: const TextStyle(fontSize: 12)),
           ],
         ),
       ),

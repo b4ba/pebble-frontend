@@ -1,5 +1,8 @@
 import 'package:ecclesia_ui/client/config/app_router.dart';
 import 'package:ecclesia_ui/server/bloc/choice_view_bloc.dart';
+import 'package:ecclesia_ui/server/bloc/election_bloc.dart';
+import 'package:ecclesia_ui/server/bloc/election_detail_bloc.dart';
+import 'package:ecclesia_ui/server/bloc/election_join_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/election_just_ended_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/election_overview_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/joined_elections_bloc.dart';
@@ -14,6 +17,10 @@ void main() {
 
   checkAndFetchKeys().then((_) {
     runApp(MultiBlocProvider(providers: [
+      BlocProvider<ElectionBloc>(create: (context) => ElectionBloc()),
+      BlocProvider<ElectionDetailBloc>(
+          create: (context) => ElectionDetailBloc()),
+      BlocProvider<ElectionJoinBloc>(create: (context) => ElectionJoinBloc()),
       BlocProvider<JoinedElectionsBloc>(
         create: (context) => JoinedElectionsBloc(),
       ),

@@ -5,7 +5,6 @@ import 'package:ecclesia_ui/client/widgets/status_tag.dart';
 import 'package:ecclesia_ui/client/widgets/status_tag_description.dart';
 import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
-import 'package:ecclesia_ui/data/models/election_status_model.dart';
 import 'package:ecclesia_ui/server/bloc/election_overview_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:flutter/material.dart';
@@ -20,12 +19,14 @@ class ElectionDashboard extends StatelessWidget {
   final String id;
   final String userId;
 
-  const ElectionDashboard({Key? key, required this.id, required this.userId}) : super(key: key);
+  const ElectionDashboard({Key? key, required this.id, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: BlocProvider.of<ElectionOverviewBloc>(context)..add(LoadElectionOverview(id: id, userId: userId)),
+      value: BlocProvider.of<ElectionOverviewBloc>(context)
+        ..add(LoadElectionOverview(id: id, userId: userId)),
       child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 246, 248, 250),
           appBar: const CustomAppBar(
@@ -34,7 +35,8 @@ class ElectionDashboard extends StatelessWidget {
             disableMenu: false,
           ),
           endDrawer: const CustomDrawer(),
-          bottomNavigationBar: BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
+          bottomNavigationBar:
+              BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
             builder: (context, state) {
               if (state is ElectionOverviewInitial) {
                 return const Padding(
@@ -53,7 +55,8 @@ class ElectionDashboard extends StatelessWidget {
                   context.go('/election-detail/$id/$userId/result');
                 }
 
-                if (state.status == ElectionStatusEnum.voteOpen || state.status == ElectionStatusEnum.voteEnding) {
+                if (state.status == ElectionStatusEnum.voteOpen ||
+                    state.status == ElectionStatusEnum.voteEnding) {
                   return Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: ElevatedButton(
@@ -64,17 +67,21 @@ class ElectionDashboard extends StatelessWidget {
                 } else if (state.status == ElectionStatusEnum.voted) {
                   return const Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: ElevatedButton(onPressed: null, child: Text('See result')),
+                    child: ElevatedButton(
+                        onPressed: null, child: Text('See result')),
                   );
                 } else if (state.status == ElectionStatusEnum.voteClosed) {
                   return Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: ElevatedButton(onPressed: goSeeResult, child: const Text('See result')),
+                    child: ElevatedButton(
+                        onPressed: goSeeResult,
+                        child: const Text('See result')),
                   );
                 } else {
                   return const Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: ElevatedButton(onPressed: null, child: Text('Start voting')),
+                    child: ElevatedButton(
+                        onPressed: null, child: Text('Start voting')),
                   );
                 }
               } else {
@@ -85,7 +92,9 @@ class ElectionDashboard extends StatelessWidget {
           body: RefreshIndicator(
             onRefresh: () {
               return Future.delayed(const Duration(seconds: 2), (() {
-                context.read<ElectionOverviewBloc>().add(RefreshElectionOverview(id: id, userId: userId));
+                context
+                    .read<ElectionOverviewBloc>()
+                    .add(RefreshElectionOverview(id: id, userId: userId));
               }));
             },
             child: ListView(
@@ -130,10 +139,15 @@ class ElectionDashboard extends StatelessWidget {
                 BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
                   builder: (context, state) {
                     if (state is ElectionOverviewInitial) {
-                      return const CircularProgressIndicator(color: Colors.blue);
+                      return const CircularProgressIndicator(
+                          color: Colors.blue);
                     } else if (state is ElectionOverviewLoaded) {
-                      bool castedStatus = state.status == ElectionStatusEnum.voted || state.status == ElectionStatusEnum.voteClosed;
-                      return castedStatus ? VoteCasted(id: id, userId: userId) : const SizedBox();
+                      bool castedStatus =
+                          state.status == ElectionStatusEnum.voted ||
+                              state.status == ElectionStatusEnum.voteClosed;
+                      return castedStatus
+                          ? VoteCasted(id: id, userId: userId)
+                          : const SizedBox();
                     } else {
                       return const Text('Something is wrong');
                     }
@@ -205,7 +219,10 @@ class VoteCasted extends StatelessWidget {
             builder: (context, state) {
               if (state is LoggedUserLoaded) {
                 final Election election = Election.elections[int.parse(id)];
-                return VoteChoiceRow(choice: state.user.votedChoices[election], id: id, userId: userId);
+                return VoteChoiceRow(
+                    choice: state.user.votedChoices[election],
+                    id: id,
+                    userId: userId);
               } else {
                 return const Text('There is something wrong');
               }
@@ -273,7 +290,8 @@ class VotingOptions extends StatelessWidget {
                 return const CircularProgressIndicator(color: Colors.blue);
               } else if (state is ElectionOverviewLoaded) {
                 Iterable<VoteChoiceRow> rows = state.election.choices.map(
-                  (choice) => VoteChoiceRow(choice: choice, id: id, userId: userId),
+                  (choice) =>
+                      VoteChoiceRow(choice: choice, id: id, userId: userId),
                 );
                 return Column(children: rows.toList(growable: false));
                 // return Column(children: const [
@@ -403,8 +421,9 @@ class ElectionTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool preparing = ElectionStatusEnum.registeringDetails == status || ElectionStatusEnum.registeringDetails == status || ElectionStatusEnum.voteNotOpen == status;
-    final bool open = ElectionStatusEnum.voteOpen == status || ElectionStatusEnum.voteEnding == status;
+    final bool preparing = ElectionStatusEnum.voteNotOpen == status;
+    final bool open = ElectionStatusEnum.voteOpen == status ||
+        ElectionStatusEnum.voteEnding == status;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

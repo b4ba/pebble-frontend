@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_circular_progress.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
-import 'package:ecclesia_ui/services/secure_storage.dart';
+import 'package:ecclesia_ui/server/bloc/election_bloc.dart';
+import 'package:ecclesia_ui/server/bloc/election_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
@@ -163,7 +164,6 @@ class JoinElectionPending extends StatelessWidget {
   void _joinElection(String inputCode) async {
     final response = await http
         .get(Uri.parse('http://localhost:8080/api/election/join/$inputCode'));
-    // final data = jsonDecode(response.body);
     if (response.statusCode == 200) {
       return;
     } else {
@@ -173,6 +173,9 @@ class JoinElectionPending extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final ElectionBloc electionBloc = BlocProvider.of<ElectionBloc>(context);
+    final electionBloc = ElectionBloc();
+
     return FutureBuilder<String?>(
       future: _getElectionToJoinKey(),
       builder: (context, snapshot) {
@@ -198,6 +201,10 @@ class JoinElectionPending extends StatelessWidget {
                       // Convert the JSON string back to Election object
                       Election storedElection =
                           Election.fromJson(jsonDecode(electionJson));
+
+                      electionBloc.add(AddElectionEvent(
+                          election: storedElection)); //adds election to bloc
+
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [

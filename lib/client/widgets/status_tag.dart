@@ -1,5 +1,6 @@
-import 'package:ecclesia_ui/data/models/election_status_model.dart';
 import 'package:flutter/material.dart';
+
+import '../../data/models/election_model.dart';
 
 // Custom widget for the small status tag that can be found at the top-right
 // corner of an election_card.dart widget
