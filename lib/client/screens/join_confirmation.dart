@@ -116,7 +116,9 @@ class JoinConfirmation extends StatelessWidget {
                       offset: const Offset(0, 6)),
                 ]),
             child: isElection
-                ? JoinElectionConfirmation()
+                ? JoinElectionConfirmation(
+                    inputCode: inputCode,
+                  )
                 : const JoinOrganizationConfirmation(),
           ),
         ),
@@ -128,11 +130,30 @@ class JoinConfirmation extends StatelessWidget {
 // Prompt message to confirm from the user of intended election
 // to join
 class JoinElectionConfirmation extends StatelessWidget {
-  JoinElectionConfirmation({super.key});
-  final storage = FlutterSecureStorage();
+  final String inputCode;
+
+  const JoinElectionConfirmation({super.key, required this.inputCode});
 
   Future<String?> _getElectionToJoin() async {
-    return await storage.read(key: 'electionToJoin');
+    final response = await http
+        .get(Uri.parse('http://localhost:8080/api/election/info/$inputCode'));
+    // final data = jsonDecode(response.body);
+    return response.body;
+    // DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+    // List<Choice> choices = data['choices']
+    //     .map<Choice>((choice) => Choice(
+    //           title: choice.toString(),
+    //           description: '$choice description',
+    //           numberOfVote: 0,
+    //         ))
+    //     .toList();
+
+    // final elec = Election(
+    //     title: data['title'],
+    //     description: data['description'],
+    //     organization: 'organization',
+    //     startTime: format.parse((data['castStart'])),
+    //     endTime: format.parse((data['tallyStart'])));
   }
 
   @override

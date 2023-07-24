@@ -7,6 +7,7 @@ import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:ecclesia_ui/server/bloc/election_overview_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
+import 'package:ecclesia_ui/services/get_election_status.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +27,7 @@ class ElectionDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    IsarService isarService = IsarService();
     return BlocProvider.value(
       value: BlocProvider.of<ElectionOverviewBloc>(context)
         ..add(LoadElectionOverview(id: id, userId: userId)),
@@ -101,27 +103,65 @@ class ElectionDashboard extends StatelessWidget {
             },
             child: ListView(
               children: [
-                BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
-                  builder: (context, state) {
-                    if (state is ElectionOverviewInitial) {
-                      return const CircularProgressIndicator(
-                        color: Colors.blue,
-                      );
-                    } else if (state is ElectionOverviewLoaded) {
-                      // await IsarService.getChoicesFor(await IsarService.getElectionById(state.election.id));
-                      return ElectionStatus(
-                        title: state.election.title,
-                        description: state.election.description,
-                        organization: state.election.organization,
-                        status: state.status,
-                        startTime: state.election.startTime,
-                        endTime: state.election.endTime,
-                      );
-                    } else {
-                      return const Text('Something is wrong');
-                    }
-                  },
-                ),
+                FutureBuilder<Election?>(
+                    future: isarService.getElectionById(id),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return const Text('Error fetching data');
+                      } else {
+                        final electionJson = snapshot.data;
+                        if (electionJson != null) {
+                          return ElectionStatus(
+                            title: electionJson.title,
+                            description: electionJson.description,
+                            organization: electionJson.organization,
+                            status: getElectionStatus(
+                                electionJson.startTime, electionJson.endTime),
+                            startTime: electionJson.startTime,
+                            endTime: electionJson.endTime,
+                          );
+                        } else {
+                          print('id: $id');
+                          return const Text('Failed to fetch this election');
+                        }
+                      }
+                    }),
+                // BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
+                //   builder: (context, state) {
+                //     if (state is ElectionOverviewInitial) {
+                //       return const CircularProgressIndicator(
+                //         color: Colors.blue,
+                //       );
+                //     } else if (state is ElectionOverviewLoaded) {
+                //       final fetchedElec = isarService
+                //           .getElectionById(state.election.id.toString());
+                //       if (fetchedElec != null) {
+                //         return ElectionStatus(
+                //           title: fetchedElec.title,
+                //           description: fetchedElec.description,
+                //           organization: fetchedElec.organization,
+                //           status: state.status,
+                //           startTime: fetchedElec.startTime,
+                //           endTime: fetchedElec.endTime,
+                //         );
+                //         // return ElectionStatus(
+                //         //   title: state.election.title,
+                //         //   description: state.election.description,
+                //         //   organization: state.election.organization,
+                //         //   status: state.status,
+                //         //   startTime: state.election.startTime,
+                //         //   endTime: state.election.endTime,
+                //         // );
+                //       } else {
+                //         return const Text('Failed to fetch this election');
+                //       }
+                //     } else {
+                //       return const Text('Something is wrong');
+                //     }
+                //   },
+                // ),
                 BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
                   builder: (context, state) {
                     if (state is ElectionOverviewInitial) {
