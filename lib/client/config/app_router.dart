@@ -22,7 +22,8 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => BlocProvider.value(
-        value: BlocProvider.of<LoggedUserBloc>(context)..add(const LoginLoggedUserEvent(userId: "1")),
+        value: BlocProvider.of<LoggedUserBloc>(context)
+          ..add(const LoginLoggedUserEvent(userId: "1")),
         child: BlocBuilder<LoggedUserBloc, LoggedUserState>(
           builder: (context, state) {
             if (state is LoggedUserLoaded) {
@@ -48,7 +49,9 @@ GoRouter appRouter = GoRouter(
         GoRoute(
           path: 'election-detail/:electionId/:userId',
           builder: (BuildContext context, GoRouterState state) {
-            return ElectionDashboard(id: state.params['electionId']!, userId: state.params['userId']!);
+            return ElectionDashboard(
+                id: state.params['electionId']!,
+                userId: state.params['userId']!);
           },
           // pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(context: context, state: state, child: ElectionDashboard(id: state.params['electionId']!, userId: state.params['userId']!)),
           routes: <GoRoute>[
@@ -56,13 +59,17 @@ GoRouter appRouter = GoRouter(
             GoRoute(
                 path: 'voting',
                 builder: (BuildContext context, GoRouterState state) {
-                  return Voting(id: state.params['electionId']!, userId: state.params['userId']!);
+                  return Voting(
+                      id: state.params['electionId']!,
+                      userId: state.params['userId']!);
                 },
                 routes: [
                   GoRoute(
                     path: 'voting-casted',
                     builder: (BuildContext context, GoRouterState state) {
-                      return VotingCasted(id: state.params['electionId']!, userId: state.params['userId']!);
+                      return VotingCasted(
+                          id: state.params['electionId']!,
+                          userId: state.params['userId']!);
                     },
                   )
                 ]),
@@ -70,14 +77,19 @@ GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'result',
               builder: (BuildContext context, GoRouterState state) {
-                return Result(id: state.params['electionId']!, userId: state.params['userId']!);
+                return Result(
+                    id: state.params['electionId']!,
+                    userId: state.params['userId']!);
               },
             ),
             // Choice info
             GoRoute(
                 path: 'info/:choiceId',
                 builder: (BuildContext context, GoRouterState state) {
-                  return ChoiceInfo(id: state.params['electionId']!, userId: state.params['userId']!, choiceId: state.params['choiceId']!);
+                  return ChoiceInfo(
+                      id: state.params['electionId']!,
+                      userId: state.params['userId']!,
+                      choiceId: state.params['choiceId']!);
                 })
           ],
         ),
@@ -93,6 +105,7 @@ GoRouter appRouter = GoRouter(
                 builder: (BuildContext context, GoRouterState state) {
                   return const JoinConfirmation(
                     isElection: false,
+                    inputCode: '123',
                   );
                 },
                 routes: [
@@ -123,7 +136,10 @@ GoRouter appRouter = GoRouter(
             GoRoute(
                 path: 'confirmation',
                 builder: (BuildContext context, GoRouterState state) {
-                  return const JoinConfirmation(isElection: true);
+                  return const JoinConfirmation(
+                    isElection: true,
+                    inputCode: '123',
+                  );
                 },
                 routes: [
                   GoRoute(
@@ -168,7 +184,8 @@ CustomTransitionPage<void> animationHelperFunction(context, state, page) {
     key: state.pageKey,
     child: page(),
     transitionDuration: const Duration(milliseconds: 300),
-    transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    transitionsBuilder: (BuildContext context, Animation<double> animation,
+        Animation<double> secondaryAnimation, Widget child) {
       // Change the opacity of the screen using a Curve based on the the animation's
       // value
       return FadeTransition(
@@ -188,11 +205,14 @@ CustomTransitionPage buildPageWithDefaultTransition<T>({
     key: state.pageKey,
     child: child,
     transitionDuration: const Duration(milliseconds: 300),
-    transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    transitionsBuilder: (BuildContext context, Animation<double> animation,
+        Animation<double> secondaryAnimation, Widget child) {
       // Change the opacity of the screen using a Curve based on the the animation's
       // value
       return SlideTransition(
-        position: Tween(begin: const Offset(1.0, 0.0), end: const Offset(0.0, 0.0)).animate(animation),
+        position:
+            Tween(begin: const Offset(1.0, 0.0), end: const Offset(0.0, 0.0))
+                .animate(animation),
         child: child,
       );
     },

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ecclesia_ui/client/screens/join_confirmation.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
@@ -111,7 +112,7 @@ class _JoinMethodState extends State<JoinMethod> {
                       children: [
                         Text(
                           widget.isElection
-                              ? 'Register to an election by:'
+                              ? 'Register to an election using a joining link:'
                               : 'Register to an organization by:',
                           textAlign: TextAlign.center,
                         ),
@@ -126,7 +127,7 @@ class _JoinMethodState extends State<JoinMethod> {
                                 });
                               }),
                               decoration: const InputDecoration(
-                                labelText: 'Input joining link here',
+                                // labelText: 'Input joining link here',
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(6)),
@@ -150,29 +151,33 @@ class _JoinMethodState extends State<JoinMethod> {
                               DateFormat format =
                                   DateFormat("yyyy-MM-ddTHH:mm:ssZ");
 
-                              List<Choice> choices = data['choices']
-                                  .map<Choice>((choice) => Choice(
-                                        id: '',
-                                        title: choice.toString(),
-                                        description: '$choice description',
-                                        numberOfVote: 0,
-                                      ))
-                                  .toList();
+                              // List<Choice> choices = data['choices']
+                              //     .map<Choice>((choice) => Choice(
+                              //           title: choice.toString(),
+                              //           description: '$choice description',
+                              //           numberOfVote: 0,
+                              //         ))
+                              //     .toList();
 
-                              final elec = Election(
-                                  id: '',
-                                  title: data['title'],
-                                  description: data['description'],
-                                  organization: 'organization',
-                                  startTime: format.parse((data['castStart'])),
-                                  endTime: format.parse((data['tallyStart'])),
-                                  choices: choices);
+                              // final elec = Election(
+                              //     title: data['title'],
+                              //     description: data['description'],
+                              //     organization: 'organization',
+                              //     startTime: format.parse((data['castStart'])),
+                              //     endTime: format.parse((data['tallyStart'])));
 
-                              storeSecureJson('electionToJoin', elec.toJson());
+                              // storeSecureJson('electionToJoin', elec.toJson());
                               storeSecure('electionToJoinKey', inputCode);
 
                               if (response.statusCode == 200) {
-                                context.go('/register-election/confirmation');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => JoinConfirmation(
+                                        isElection: true, inputCode: inputCode),
+                                  ),
+                                );
+                                // context.go('/register-election/confirmation');
                               } else {
                                 throw Exception('Failed to fetch data');
                               }

@@ -3,7 +3,7 @@ import 'package:ecclesia_ui/client/widgets/custom_container.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/client/widgets/custom_radio_list_tile.dart';
 import 'package:ecclesia_ui/data/models/choice_model.dart';
-import 'package:ecclesia_ui/data/models/election_status_model.dart';
+import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:ecclesia_ui/server/bloc/election_overview_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/joined_elections_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
@@ -17,7 +17,8 @@ import 'package:go_router/go_router.dart';
 class Voting extends StatefulWidget {
   final String id;
   final String userId;
-  const Voting({Key? key, required this.id, required this.userId}) : super(key: key);
+  const Voting({Key? key, required this.id, required this.userId})
+      : super(key: key);
 
   @override
   State<Voting> createState() => _VotingState();
@@ -93,11 +94,20 @@ class _VotingState extends State<Voting> {
                     if (state is ElectionOverviewLoaded) {
                       return ElevatedButton(
                         onPressed: () {
-                          context.read<ElectionOverviewBloc>().add(ChangeElectionOverview(election: state.election, status: ElectionStatusEnum.castingBallot));
-                          context.read<JoinedElectionsBloc>().add(UpdateStatusJoinedElection(election: state.election, status: ElectionStatusEnum.voted));
-                          context.read<LoggedUserBloc>().add(ConfirmVoteLoggedUserEvent(choice: selectedChoice, id: widget.id));
+                          context.read<ElectionOverviewBloc>().add(
+                              ChangeElectionOverview(
+                                  election: state.election,
+                                  status: ElectionStatusEnum.voted));
+                          context.read<JoinedElectionsBloc>().add(
+                              UpdateStatusJoinedElection(
+                                  election: state.election,
+                                  status: ElectionStatusEnum.voted));
+                          context.read<LoggedUserBloc>().add(
+                              ConfirmVoteLoggedUserEvent(
+                                  choice: selectedChoice, id: widget.id));
 
-                          context.go("/election-detail/${widget.id}/${widget.userId}/voting/voting-casted");
+                          context.go(
+                              "/election-detail/${widget.id}/${widget.userId}/voting/voting-casted");
                           debugPrint('Confirm ballot! with id ${widget.id}');
                         },
                         child: const Text('I cast my vote!'),
@@ -113,9 +123,11 @@ class _VotingState extends State<Voting> {
                   : ElevatedButton(
                       onPressed: hasChosen ? removeSelection : chooseSelection,
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(hasChosen ? Colors.black : Colors.blue),
+                        backgroundColor: MaterialStateProperty.all(
+                            hasChosen ? Colors.black : Colors.blue),
                       ),
-                      child: Text(hasChosen ? 'No, I change my mind' : 'I choose this'),
+                      child: Text(
+                          hasChosen ? 'No, I change my mind' : 'I choose this'),
                     ),
             ],
           ),
@@ -265,10 +277,10 @@ class VotingPicker extends StatelessWidget {
                 child: ListView.builder(
                     itemCount: state.election.choices.length,
                     itemBuilder: (_, index) {
-                      Choice choice = state.election.choices[index];
+                      Choice choice = state.election.choices.elementAt(index);
                       return CustomRadioListTile(
                         choice: choice,
-                        value: choice.id,
+                        value: choice.id.toString(),
                         groupValue: chosenOption,
                         onChanged: (value, choice) {
                           // debugPrint(value);
@@ -277,7 +289,8 @@ class VotingPicker extends StatelessWidget {
                         leading: Icons.close,
                         title: Text(
                           choice.title,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 18),
                         ),
                       );
                     }),

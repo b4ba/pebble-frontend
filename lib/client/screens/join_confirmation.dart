@@ -2,24 +2,32 @@ import 'dart:convert';
 
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
+import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
+import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 // Screen to prompt user whether their intended organization/election
 // to be joined is correct.
 
 class JoinConfirmation extends StatelessWidget {
   final bool isElection;
+  final String inputCode;
 
-  const JoinConfirmation({Key? key, required this.isElection})
+  const JoinConfirmation(
+      {Key? key, required this.isElection, required this.inputCode})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    IsarService isarService = IsarService();
+
     return BlocProvider.value(
       value: BlocProvider.of<LoggedUserBloc>(context),
       child: Scaffold(
@@ -33,17 +41,38 @@ class JoinConfirmation extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  // TODO: This is hard-coded
+                onPressed: () async {
                   if (isElection) {
-                    context
-                        .read<LoggedUserBloc>()
-                        .add(const JoinElectionLoggedUserEvent(id: '4'));
+                    final response = await http.get(Uri.parse(
+                        'http://localhost:8080/api/election/info/$inputCode'));
+                    final data = jsonDecode(response.body);
+
+                    DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+                    List<Choice> choices = data['choices']
+                        .map<Choice>((choice) => Choice(
+                              title: choice.toString(),
+                              description: '$choice description',
+                              numberOfVote: 0,
+                            ))
+                        .toList();
+
+                    final elec = Election(
+                        title: data['title'],
+                        description: data['description'],
+                        organization: 'organization',
+                        startTime: format.parse((data['castStart'])),
+                        endTime: format.parse((data['tallyStart'])));
+
+                    isarService.addElection(elec);
+                    // context
+                    //     .read<LoggedUserBloc>()
+                    //     .add(const JoinElectionLoggedUserEvent(id: '4'));
                     context.go('/register-election/confirmation/confirmed');
                   } else {
-                    context.read<LoggedUserBloc>().add(
-                        const JoinOrganizationLoggedUserEvent(
-                            organizationId: '3'));
+                    print('hi');
+                    // context.read<LoggedUserBloc>().add(
+                    //     const JoinOrganizationLoggedUserEvent(
+                    //         organizationId: '3'));
                     context.go('/register-organization/confirmation/confirmed');
                   }
                 },

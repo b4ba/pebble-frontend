@@ -1,6 +1,5 @@
 import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
-import 'package:ecclesia_ui/data/models/election_status_model.dart';
 import 'package:ecclesia_ui/data/models/organization_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -59,7 +58,7 @@ class Voter extends Equatable {
       joinedElections: {
         Election.elections[0]: ElectionStatusEnum.voteClosed,
         Election.elections[1]: ElectionStatusEnum.voteEnding,
-        Election.elections[2]: ElectionStatusEnum.registeringDetails,
+        Election.elections[2]: ElectionStatusEnum.voted,
       },
       votedChoices: {
         Election.elections[0]: Choice.personChoice[0],

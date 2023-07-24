@@ -1,4 +1,4 @@
-import 'package:ecclesia_ui/data/models/election_status_model.dart';
+import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:flutter/material.dart';
 
 // Widget that presents the details of the election from title,

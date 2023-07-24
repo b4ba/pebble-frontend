@@ -10,7 +10,8 @@ class ChoiceViewBloc extends Bloc<ChoiceViewEvent, ChoiceViewState> {
     on<LoadChoiceView>((event, emit) {
       final int electionId = int.parse(event.electionId);
       final int choiceId = int.parse(event.choiceId);
-      final Choice choice = Election.elections[electionId].choices[choiceId];
+      final Choice choice =
+          Election.elections[electionId].choices.elementAt(choiceId);
 
       emit(ChoiceViewLoaded(choice: choice));
     });

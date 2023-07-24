@@ -10,7 +10,6 @@ void storeKeys(Map<String, dynamic> keys) {
 
 void storeSecure(String key, String value) {
   const storage = FlutterSecureStorage();
-  //key: joinedElections
   storage.write(key: key, value: value);
 }
 
