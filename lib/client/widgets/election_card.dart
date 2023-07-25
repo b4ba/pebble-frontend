@@ -61,7 +61,6 @@ class ElectionCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       )),
                 ),
-                ///////// SOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSOSO
                 SizedBox(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,

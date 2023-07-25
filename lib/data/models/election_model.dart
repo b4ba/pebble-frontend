@@ -15,7 +15,7 @@ class Election extends Equatable {
   final String organization;
   final DateTime startTime;
   final DateTime endTime;
-  // @ignore
+  final String invitationId;
   final choices = IsarLinks<Choice>();
   // final List<Choice> choices;
 
@@ -25,6 +25,7 @@ class Election extends Equatable {
     required this.organization,
     required this.startTime,
     required this.endTime,
+    required this.invitationId,
     // required this.choices
   });
 
@@ -41,47 +42,52 @@ class Election extends Equatable {
       organization: 'Edinburgh University Sports Union (EUSU)',
       startTime: DateTime.parse("2022-02-23"),
       endTime: DateTime.parse("2022-03-23"),
+      invitationId: '1',
       // choices: Choice.personChoice,
     ),
     Election(
-      title: 'Best food (April)',
-      description:
-          'Voters will vote for their favorite dish from a selection of options. They will be presented to the voters and they will have to decide which one they like the most for the month of April.',
-      organization: 'Edinburgh Baking Society',
-      startTime: DateTime.parse("2022-04-10"),
-      endTime: DateTime.parse("2022-04-23"),
-      // choices: Choice.foodChoice,
-    ),
+        title: 'Best food (April)',
+        description:
+            'Voters will vote for their favorite dish from a selection of options. They will be presented to the voters and they will have to decide which one they like the most for the month of April.',
+        organization: 'Edinburgh Baking Society',
+        startTime: DateTime.parse("2022-04-10"),
+        endTime: DateTime.parse("2022-04-23"),
+        invitationId: '2'
+        // choices: Choice.foodChoice,
+        ),
     Election(
-      title: 'Social Meetup for the first time in a while (Dec)',
-      description:
-          'It has been a while since we hangout as a club. Come and vote for the place where we can hangout and catch-up!',
-      organization: 'Informatics 19/23',
-      startTime: DateTime.parse("2022-04-15"),
-      endTime: DateTime.parse("2022-04-25"),
-      // choices: Choice.personChoice,
-    ),
+        title: 'Social Meetup for the first time in a while (Dec)',
+        description:
+            'It has been a while since we hangout as a club. Come and vote for the place where we can hangout and catch-up!',
+        organization: 'Informatics 19/23',
+        startTime: DateTime.parse("2022-04-15"),
+        endTime: DateTime.parse("2022-04-25"),
+        invitationId: '3'
+        // choices: Choice.personChoice,
+        ),
     Election(
-      title: 'New pet name for the club?',
-      description:
-          'A member of the club found a cute stray dog and was thinking of making it the club\'s pet. What should we name it?',
-      organization: 'Informatics 19/23',
-      startTime: DateTime.parse("2022-04-15"),
-      endTime: DateTime.parse("2022-04-25"),
-      // choices: Choice.personChoice,
-    ),
+        title: 'New pet name for the club?',
+        description:
+            'A member of the club found a cute stray dog and was thinking of making it the club\'s pet. What should we name it?',
+        organization: 'Informatics 19/23',
+        startTime: DateTime.parse("2022-04-15"),
+        endTime: DateTime.parse("2022-04-25"),
+        invitationId: '4'
+        // choices: Choice.personChoice,
+        ),
     Election(
-      title: 'Club socials',
-      description:
-          'It\'s our monthly socials again! What should we do for this month of February?',
-      organization: 'Edinburgh Baking Society',
-      startTime: DateTime.parse("2023-02-15"),
-      endTime: DateTime.parse("2023-02-25"),
-      // choices: Choice.pubChoice,
-    )
+        title: 'Club socials',
+        description:
+            'It\'s our monthly socials again! What should we do for this month of February?',
+        organization: 'Edinburgh Baking Society',
+        startTime: DateTime.parse("2023-02-15"),
+        endTime: DateTime.parse("2023-02-25"),
+        invitationId: '5'
+        // choices: Choice.pubChoice,
+        )
   ];
 
-  factory Election.fromJson(Map<String, dynamic> json) {
+  factory Election.fromJson(Map<String, dynamic> json, String invitationId) {
     List<dynamic> choicesJson = json['choices'];
     List<Choice> choices =
         choicesJson.map((choice) => Choice.fromJson(choice)).toList();
@@ -92,6 +98,7 @@ class Election extends Equatable {
       organization: json['organization'],
       startTime: DateTime.parse(json['startTime']),
       endTime: DateTime.parse(json['endTime']),
+      invitationId: invitationId,
       // choices: choices,
     );
   }

@@ -27,18 +27,23 @@ const ElectionSchema = CollectionSchema(
       name: r'endTime',
       type: IsarType.dateTime,
     ),
-    r'organization': PropertySchema(
+    r'invitationId': PropertySchema(
       id: 2,
+      name: r'invitationId',
+      type: IsarType.string,
+    ),
+    r'organization': PropertySchema(
+      id: 3,
       name: r'organization',
       type: IsarType.string,
     ),
     r'startTime': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'startTime',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'title',
       type: IsarType.string,
     )
@@ -71,6 +76,7 @@ int _electionEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.description.length * 3;
+  bytesCount += 3 + object.invitationId.length * 3;
   bytesCount += 3 + object.organization.length * 3;
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
@@ -84,9 +90,10 @@ void _electionSerialize(
 ) {
   writer.writeString(offsets[0], object.description);
   writer.writeDateTime(offsets[1], object.endTime);
-  writer.writeString(offsets[2], object.organization);
-  writer.writeDateTime(offsets[3], object.startTime);
-  writer.writeString(offsets[4], object.title);
+  writer.writeString(offsets[2], object.invitationId);
+  writer.writeString(offsets[3], object.organization);
+  writer.writeDateTime(offsets[4], object.startTime);
+  writer.writeString(offsets[5], object.title);
 }
 
 Election _electionDeserialize(
@@ -98,9 +105,10 @@ Election _electionDeserialize(
   final object = Election(
     description: reader.readString(offsets[0]),
     endTime: reader.readDateTime(offsets[1]),
-    organization: reader.readString(offsets[2]),
-    startTime: reader.readDateTime(offsets[3]),
-    title: reader.readString(offsets[4]),
+    invitationId: reader.readString(offsets[2]),
+    organization: reader.readString(offsets[3]),
+    startTime: reader.readDateTime(offsets[4]),
+    title: reader.readString(offsets[5]),
   );
   return object;
 }
@@ -119,8 +127,10 @@ P _electionDeserializeProp<P>(
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 4:
+      return (reader.readDateTime(offset)) as P;
+    case 5:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -449,6 +459,140 @@ extension ElectionQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition> invitationIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition>
+      invitationIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition> invitationIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition> invitationIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'invitationId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition>
+      invitationIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition> invitationIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition> invitationIdContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition> invitationIdMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'invitationId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition>
+      invitationIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'invitationId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterFilterCondition>
+      invitationIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'invitationId',
+        value: '',
       ));
     });
   }
@@ -859,6 +1003,18 @@ extension ElectionQuerySortBy on QueryBuilder<Election, Election, QSortBy> {
     });
   }
 
+  QueryBuilder<Election, Election, QAfterSortBy> sortByInvitationId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterSortBy> sortByInvitationIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Election, Election, QAfterSortBy> sortByOrganization() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'organization', Sort.asc);
@@ -934,6 +1090,18 @@ extension ElectionQuerySortThenBy
     });
   }
 
+  QueryBuilder<Election, Election, QAfterSortBy> thenByInvitationId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Election, Election, QAfterSortBy> thenByInvitationIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Election, Election, QAfterSortBy> thenByOrganization() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'organization', Sort.asc);
@@ -986,6 +1154,13 @@ extension ElectionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Election, Election, QDistinct> distinctByInvitationId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'invitationId', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Election, Election, QDistinct> distinctByOrganization(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1024,6 +1199,12 @@ extension ElectionQueryProperty
   QueryBuilder<Election, DateTime, QQueryOperations> endTimeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'endTime');
+    });
+  }
+
+  QueryBuilder<Election, String, QQueryOperations> invitationIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'invitationId');
     });
   }
 

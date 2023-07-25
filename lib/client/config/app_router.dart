@@ -47,10 +47,10 @@ GoRouter appRouter = GoRouter(
         ),
         // Election Detail
         GoRoute(
-          path: 'election-detail/:electionId/:userId',
+          path: 'election-detail/:invitationId/:userId',
           builder: (BuildContext context, GoRouterState state) {
             return ElectionDashboard(
-                id: state.params['electionId']!,
+                invitationId: state.params['invitationId']!,
                 userId: state.params['userId']!);
           },
           // pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(context: context, state: state, child: ElectionDashboard(id: state.params['electionId']!, userId: state.params['userId']!)),
@@ -108,11 +108,11 @@ GoRouter appRouter = GoRouter(
                 },
                 routes: [
                   GoRoute(
-                    path: 'confirmed/:electionId',
+                    path: 'confirmed/:invitationId',
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: false,
-                        electionId: state.params['electionId']!,
+                        invitationId: state.params['invitationId']!,
                       );
                     },
                   ),
@@ -140,11 +140,11 @@ GoRouter appRouter = GoRouter(
                 },
                 routes: [
                   GoRoute(
-                    path: 'confirmed/:electionId',
+                    path: 'confirmed/:invitationId',
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: true,
-                        electionId: state.params['electionId']!,
+                        invitationId: state.params['invitationId']!,
                       );
                     },
                   ),

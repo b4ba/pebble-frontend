@@ -10,6 +10,11 @@ class IsarService {
     db = openDB();
   }
 
+  Future<Election?> getElectionByInvitationId(String invId) async {
+    final isar = await db;
+    return await isar.elections.filter().invitationIdEqualTo(invId).findFirst();
+  }
+
   Future<void> addElection(Election election) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.elections.putSync(election));

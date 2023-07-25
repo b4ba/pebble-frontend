@@ -84,7 +84,7 @@ class JoinedElectionList extends StatelessWidget {
                                       .toList();
                                   // Display the ElectionCard for the just ended election
                                   return ElectionCard(
-                                    id: justEndedElections.first.id.toString(),
+                                    id: justEndedElections.first.invitationId,
                                     electionTitle:
                                         justEndedElections.first.title,
                                     electionDescription:
@@ -94,6 +94,7 @@ class JoinedElectionList extends StatelessWidget {
                                     status: getElectionStatus(
                                         justEndedElections.first.startTime,
                                         justEndedElections.first.endTime),
+                                    // userId: user.id,
                                     userId: user.id,
                                   );
                                 } else {
@@ -165,7 +166,7 @@ class JoinedElectionList extends StatelessWidget {
                                               }
 
                                               return ElectionCard(
-                                                id: key.id.toString(),
+                                                id: key.invitationId,
                                                 electionTitle: key.title,
                                                 electionDescription:
                                                     key.description,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ecclesia_ui/client/screens/join_confirmed.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/choice_model.dart';
@@ -47,6 +48,7 @@ class JoinConfirmation extends StatelessWidget {
                     if (response.statusCode == 200) {
                       final elecInfoResponse = await http.get(Uri.parse(
                           'http://localhost:8080/api/election/info/$inputCode'));
+                      //fetch election data & add election to db
                       final data = jsonDecode(elecInfoResponse.body);
 
                       DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
@@ -63,14 +65,22 @@ class JoinConfirmation extends StatelessWidget {
                           description: data['description'],
                           organization: 'organization',
                           startTime: format.parse((data['castStart'])),
-                          endTime: format.parse((data['tallyStart'])));
+                          endTime: format.parse((data['tallyStart'])),
+                          invitationId: inputCode);
 
                       isarService.addElection(elec);
-                      // ignore: use_build_context_synchronously
-                      context.go(
-                          '/register-election/confirmation/confirmed?electionId=${elec.id}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JoinConfirmed(
+                            isElection: true,
+                            invitationId: elec.invitationId,
+                          ),
+                        ),
+                      );
+                      // context.go('/register-election/confirmed/$inputCode');
                     } else {
-                      context.go('/register-election/confirmation/failed');
+                      context.go('/register-election/failed');
                       return;
                     }
                     // context
@@ -144,13 +154,23 @@ class JoinElectionConfirmation extends StatelessWidget {
   Future<Election> _getElectionToJoin() async {
     final response = await http
         .get(Uri.parse('http://localhost:8080/api/election/info/$inputCode'));
-    // final data = jsonDecode(response.body);
     final electionData = jsonDecode(response.body);
+
     if (electionData != null) {
-      print('data isnt null');
-      // Convert the JSON string back to Election object
       // Election storedElection = Election.fromJson(electionData);
       DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+
+      // print(electionData['title']);
+
+      final elec = Election(
+        title: electionData['title'],
+        description: electionData['description'],
+        organization: 'organization',
+        startTime: format.parse((electionData['castStart'])),
+        endTime: format.parse((electionData['tallyStart'])),
+        invitationId: inputCode,
+      );
+
       List<Choice> choices = electionData['choices']
           .map<Choice>((choice) => Choice(
                 title: choice.toString(),
@@ -159,15 +179,6 @@ class JoinElectionConfirmation extends StatelessWidget {
               ))
           .toList();
 
-      final elec = Election(
-          title: electionData['title'],
-          description: electionData['description'],
-          organization: 'organization',
-          startTime: format.parse((electionData['castStart'])),
-          endTime: format.parse((electionData['tallyStart'])));
-
-      print('storedElection:');
-      print(elec);
       return elec;
     }
     print('data is null');
@@ -176,7 +187,8 @@ class JoinElectionConfirmation extends StatelessWidget {
         description: 'description',
         organization: 'organization',
         startTime: DateTime.now(),
-        endTime: DateTime.now());
+        endTime: DateTime.now(),
+        invitationId: inputCode);
   }
 
   // DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
@@ -203,6 +215,7 @@ class JoinElectionConfirmation extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
+            print(snapshot.error);
             return const Text('Error fetching data');
           } else {
             if (snapshot.data != null) {

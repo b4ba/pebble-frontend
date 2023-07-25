@@ -19,10 +19,11 @@ import 'package:isar/isar.dart';
 // the election in terms of the name, start and end time, choices, and etc.
 
 class ElectionDashboard extends StatelessWidget {
-  final String id;
+  final String invitationId;
   final String userId;
 
-  const ElectionDashboard({Key? key, required this.id, required this.userId})
+  const ElectionDashboard(
+      {Key? key, required this.invitationId, required this.userId})
       : super(key: key);
 
   @override
@@ -30,7 +31,8 @@ class ElectionDashboard extends StatelessWidget {
     IsarService isarService = IsarService();
     return BlocProvider.value(
       value: BlocProvider.of<ElectionOverviewBloc>(context)
-        ..add(LoadElectionOverview(id: id, userId: userId)),
+        ..add(
+            LoadElectionOverview(id: invitationId, userId: userId)), //! invId?
       child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 246, 248, 250),
           appBar: const CustomAppBar(
@@ -52,11 +54,11 @@ class ElectionDashboard extends StatelessWidget {
                 );
               } else if (state is ElectionOverviewLoaded) {
                 goVote() {
-                  context.go('/election-detail/$id/$userId/voting');
+                  context.go('/election-detail/$invitationId/${userId}/voting');
                 }
 
                 goSeeResult() {
-                  context.go('/election-detail/$id/$userId/result');
+                  context.go('/election-detail/$invitationId/$userId/result');
                 }
 
                 if (state.status == ElectionStatusEnum.voteOpen ||
@@ -96,15 +98,14 @@ class ElectionDashboard extends StatelessWidget {
           body: RefreshIndicator(
             onRefresh: () {
               return Future.delayed(const Duration(seconds: 2), (() {
-                context
-                    .read<ElectionOverviewBloc>()
-                    .add(RefreshElectionOverview(id: id, userId: userId));
+                context.read<ElectionOverviewBloc>().add(
+                    RefreshElectionOverview(id: invitationId, userId: userId));
               }));
             },
             child: ListView(
               children: [
                 FutureBuilder<Election?>(
-                    future: isarService.getElectionById(id),
+                    future: isarService.getElectionByInvitationId(invitationId),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -123,7 +124,6 @@ class ElectionDashboard extends StatelessWidget {
                             endTime: electionJson.endTime,
                           );
                         } else {
-                          print('id: $id');
                           return const Text('Failed to fetch this election');
                         }
                       }
@@ -177,7 +177,7 @@ class ElectionDashboard extends StatelessWidget {
                     }
                   },
                 ),
-                VotingOptions(id: id, userId: userId),
+                VotingOptions(id: invitationId, userId: userId),
                 BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
                   builder: (context, state) {
                     if (state is ElectionOverviewInitial) {
@@ -188,7 +188,7 @@ class ElectionDashboard extends StatelessWidget {
                           state.status == ElectionStatusEnum.voted ||
                               state.status == ElectionStatusEnum.voteClosed;
                       return castedStatus
-                          ? VoteCasted(id: id, userId: userId)
+                          ? VoteCasted(id: invitationId, userId: userId)
                           : const SizedBox();
                     } else {
                       return const Text('Something is wrong');

@@ -19,9 +19,9 @@ import '../../services/isar_services.dart';
 
 class JoinConfirmed extends StatefulWidget {
   final bool isElection;
-  final String electionId;
+  final String invitationId;
   const JoinConfirmed(
-      {Key? key, required this.isElection, required this.electionId})
+      {Key? key, required this.isElection, required this.invitationId})
       : super(key: key);
 
   @override
@@ -91,7 +91,7 @@ class _JoinConfirmedState extends State<JoinConfirmed> {
                           offset: const Offset(0, 6)),
                     ]),
                 child: widget.isElection
-                    ? JoinElectionPending(electionId: widget.electionId)
+                    ? JoinElectionPending(invitationId: widget.invitationId)
                     : const JoinOrganizationConfirmed(),
               ),
       ),
@@ -154,16 +154,16 @@ class JoinOrganizationConfirmed extends StatelessWidget {
 // Custom widget to show message on confirmation of joining
 // an election
 class JoinElectionPending extends StatelessWidget {
-  final String electionId;
-  JoinElectionPending({super.key, required this.electionId});
+  final String invitationId;
+  JoinElectionPending({super.key, required this.invitationId});
 
   @override
   Widget build(BuildContext context) {
     IsarService isarService = IsarService();
 // Election.fromJson(jsonDecode(electionJson));
-    // Election storedElection = isarService.getElectionById(id: electionId);
+    // Election storedElection = isarService.getElectionById(id: invitationId);
     return FutureBuilder<Election?>(
-        future: isarService.getElectionById(electionId),
+        future: isarService.getElectionByInvitationId(invitationId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();

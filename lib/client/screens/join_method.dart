@@ -145,42 +145,15 @@ class _JoinMethodState extends State<JoinMethod> {
                         ElevatedButton(
                           onPressed: () async {
                             if (widget.isElection) {
-                              final response = await http.get(Uri.parse(
-                                  'http://localhost:8080/api/election/info/$inputCode'));
-                              final data = jsonDecode(response.body);
+                              // final response = await http.get(Uri.parse(
+                              //     'http://localhost:8080/api/election/info/$inputCode'));
 
-                              DateFormat format =
-                                  DateFormat("yyyy-MM-ddTHH:mm:ssZ");
-
-                              // List<Choice> choices = data['choices']
-                              //     .map<Choice>((choice) => Choice(
-                              //           title: choice.toString(),
-                              //           description: '$choice description',
-                              //           numberOfVote: 0,
-                              //         ))
-                              //     .toList();
-
-                              // final elec = Election(
-                              //     title: data['title'],
-                              //     description: data['description'],
-                              //     organization: 'organization',
-                              //     startTime: format.parse((data['castStart'])),
-                              //     endTime: format.parse((data['tallyStart'])));
-
-                              // storeSecureJson('electionToJoin', elec.toJson());
-                              if (response.statusCode == 200) {
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => JoinConfirmation(
-                                //         isElection: true, inputCode: inputCode),
-                                //   ),
-                                // );
-                                context.go(
-                                    '/register-election/confirmation/$inputCode');
-                              } else {
-                                throw Exception('Failed to fetch data');
-                              }
+                              // if (response.statusCode == 200) {
+                              context.go(
+                                  '/register-election/confirmation/$inputCode');
+                              // } else {
+                              //   throw Exception('Failed to fetch data');
+                              // }
                             } else {
                               // TODO: This is hard-coded and should be change
                               if (inputCode == 'edinburghuni432') {
