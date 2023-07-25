@@ -27,7 +27,6 @@ class JoinConfirmation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     IsarService isarService = IsarService();
-
     return BlocProvider.value(
       value: BlocProvider.of<LoggedUserBloc>(context),
       child: Scaffold(
@@ -44,32 +43,40 @@ class JoinConfirmation extends StatelessWidget {
                 onPressed: () async {
                   if (isElection) {
                     final response = await http.get(Uri.parse(
-                        'http://localhost:8080/api/election/info/$inputCode'));
-                    final data = jsonDecode(response.body);
+                        'http://localhost:8080/api/election/join/$inputCode'));
+                    if (response.statusCode == 200) {
+                      final elecInfoResponse = await http.get(Uri.parse(
+                          'http://localhost:8080/api/election/info/$inputCode'));
+                      final data = jsonDecode(elecInfoResponse.body);
 
-                    DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
-                    List<Choice> choices = data['choices']
-                        .map<Choice>((choice) => Choice(
-                              title: choice.toString(),
-                              description: '$choice description',
-                              numberOfVote: 0,
-                            ))
-                        .toList();
+                      DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+                      List<Choice> choices = data['choices']
+                          .map<Choice>((choice) => Choice(
+                                title: choice.toString(),
+                                description: '$choice description',
+                                numberOfVote: 0,
+                              ))
+                          .toList();
 
-                    final elec = Election(
-                        title: data['title'],
-                        description: data['description'],
-                        organization: 'organization',
-                        startTime: format.parse((data['castStart'])),
-                        endTime: format.parse((data['tallyStart'])));
+                      final elec = Election(
+                          title: data['title'],
+                          description: data['description'],
+                          organization: 'organization',
+                          startTime: format.parse((data['castStart'])),
+                          endTime: format.parse((data['tallyStart'])));
 
-                    isarService.addElection(elec);
+                      isarService.addElection(elec);
+                      // ignore: use_build_context_synchronously
+                      context.go(
+                          '/register-election/confirmation/confirmed?electionId=${elec.id}');
+                    } else {
+                      context.go('/register-election/confirmation/failed');
+                      return;
+                    }
                     // context
                     //     .read<LoggedUserBloc>()
                     //     .add(const JoinElectionLoggedUserEvent(id: '4'));
-                    context.go('/register-election/confirmation/confirmed');
                   } else {
-                    print('hi');
                     // context.read<LoggedUserBloc>().add(
                     //     const JoinOrganizationLoggedUserEvent(
                     //         organizationId: '3'));
@@ -132,86 +139,112 @@ class JoinConfirmation extends StatelessWidget {
 class JoinElectionConfirmation extends StatelessWidget {
   final String inputCode;
 
-  const JoinElectionConfirmation({super.key, required this.inputCode});
+  JoinElectionConfirmation({super.key, required this.inputCode});
 
-  Future<String?> _getElectionToJoin() async {
+  Future<Election> _getElectionToJoin() async {
     final response = await http
         .get(Uri.parse('http://localhost:8080/api/election/info/$inputCode'));
     // final data = jsonDecode(response.body);
-    return response.body;
-    // DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
-    // List<Choice> choices = data['choices']
-    //     .map<Choice>((choice) => Choice(
-    //           title: choice.toString(),
-    //           description: '$choice description',
-    //           numberOfVote: 0,
-    //         ))
-    //     .toList();
+    final electionData = jsonDecode(response.body);
+    if (electionData != null) {
+      print('data isnt null');
+      // Convert the JSON string back to Election object
+      // Election storedElection = Election.fromJson(electionData);
+      DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+      List<Choice> choices = electionData['choices']
+          .map<Choice>((choice) => Choice(
+                title: choice.toString(),
+                description: '$choice description',
+                numberOfVote: 0,
+              ))
+          .toList();
 
-    // final elec = Election(
-    //     title: data['title'],
-    //     description: data['description'],
-    //     organization: 'organization',
-    //     startTime: format.parse((data['castStart'])),
-    //     endTime: format.parse((data['tallyStart'])));
+      final elec = Election(
+          title: electionData['title'],
+          description: electionData['description'],
+          organization: 'organization',
+          startTime: format.parse((electionData['castStart'])),
+          endTime: format.parse((electionData['tallyStart'])));
+
+      print('storedElection:');
+      print(elec);
+      return elec;
+    }
+    print('data is null');
+    return Election(
+        title: 'title',
+        description: 'description',
+        organization: 'organization',
+        startTime: DateTime.now(),
+        endTime: DateTime.now());
   }
+
+  // DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
+  // List<Choice> choices = data['choices']
+  //     .map<Choice>((choice) => Choice(
+  //           title: choice.toString(),
+  //           description: '$choice description',
+  //           numberOfVote: 0,
+  //         ))
+  //     .toList();
+
+  // final elec = Election(
+  //     title: data['title'],
+  //     description: data['description'],
+  //     organization: 'organization',
+  //     startTime: format.parse((data['castStart'])),
+  //     endTime: format.parse((data['tallyStart'])));
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _getElectionToJoin(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return const Text('Error fetching data');
-        } else {
-          final electionJson = snapshot.data;
-
-          if (electionJson != null) {
-            // Convert the JSON string back to Election object
-            Election storedElection =
-                Election.fromJson(jsonDecode(electionJson));
-
-            // Use the stored Election object as needed
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'You are joining the election:',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  storedElection.organization.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18),
-                ),
-                Text(
-                  storedElection.title.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 25),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                const Text(
-                  'Are you sure?',
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            );
+    return FutureBuilder<Election?>(
+        future: _getElectionToJoin(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return const Text('Error fetching data');
           } else {
-            // Return your widget tree when no election data is available
-            return const NoDataWidget();
+            if (snapshot.data != null) {
+              final election = snapshot.data;
+
+              // Use the stored Election object as needed
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'You are joining the election:',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    election!.organization.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    election!.title.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 25),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const Text(
+                    'Are you sure?',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              );
+            } else {
+              return const NoDataWidget();
+            }
           }
-        }
-      },
-    );
+        });
   }
 }
 

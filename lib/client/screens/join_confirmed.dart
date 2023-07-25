@@ -11,13 +11,18 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 
+import '../../services/isar_services.dart';
+
 // Screen to show the status of the user's registeration to an
 // organization/election
 // DEV NOTE: At the moment it is hard-coded
 
 class JoinConfirmed extends StatefulWidget {
   final bool isElection;
-  const JoinConfirmed({Key? key, required this.isElection}) : super(key: key);
+  final String electionId;
+  const JoinConfirmed(
+      {Key? key, required this.isElection, required this.electionId})
+      : super(key: key);
 
   @override
   State<JoinConfirmed> createState() => _JoinConfirmedState();
@@ -86,7 +91,7 @@ class _JoinConfirmedState extends State<JoinConfirmed> {
                           offset: const Offset(0, 6)),
                     ]),
                 child: widget.isElection
-                    ? JoinElectionPending()
+                    ? JoinElectionPending(electionId: widget.electionId)
                     : const JoinOrganizationConfirmed(),
               ),
       ),
@@ -149,112 +154,76 @@ class JoinOrganizationConfirmed extends StatelessWidget {
 // Custom widget to show message on confirmation of joining
 // an election
 class JoinElectionPending extends StatelessWidget {
-  JoinElectionPending({super.key});
-  final storage = FlutterSecureStorage();
-
-  Future<String?> _getElectionToJoinKey() async {
-    return await storage.read(key: 'electionToJoinKey');
-  }
-
-  Future<String?> _getElectionToJoin() async {
-    return await storage.read(key: 'electionToJoin');
-  }
-
-  void _joinElection(String inputCode) async {
-    final response = await http
-        .get(Uri.parse('http://localhost:8080/api/election/join/$inputCode'));
-    // final data = jsonDecode(response.body);
-    if (response.statusCode == 200) {
-      return;
-    } else {
-      throw Exception('Failed to fetch data');
-    }
-  }
+  final String electionId;
+  JoinElectionPending({super.key, required this.electionId});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: _getElectionToJoinKey(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return const Text('Error fetching data');
-        } else {
-          final electionInvitation = snapshot.data;
-          if (electionInvitation != null) {
-            _joinElection(electionInvitation);
-
-            return FutureBuilder<String?>(
-                future: _getElectionToJoin(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return const Text('Error fetching data');
-                  } else {
-                    final electionJson = snapshot.data;
-                    if (electionJson != null) {
-                      // Convert the JSON string back to Election object
-                      Election storedElection =
-                          Election.fromJson(jsonDecode(electionJson));
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.av_timer_rounded,
-                            size: 80,
-                            color: Colors.orange,
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'Your current status on joining the election:',
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            storedElection.organization.toString(),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          Text(
-                            storedElection.title.toString(),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 20),
-                          ),
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 3.0, horizontal: 10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(100.0),
-                            ),
-                            child: const Text('Registering your details',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                )),
-                          ),
-                          const SizedBox(height: 10),
-                          // const Text(
-                          //   'We will send you an email to notify if you have been successfully registered',
-                          //   textAlign: TextAlign.center,
-                          // ),
-                        ],
-                      );
-                    } else {
-                      return const NoDataWidget();
-                    }
-                  }
-                });
+    IsarService isarService = IsarService();
+// Election.fromJson(jsonDecode(electionJson));
+    // Election storedElection = isarService.getElectionById(id: electionId);
+    return FutureBuilder<Election?>(
+        future: isarService.getElectionById(electionId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return const Text('Error fetching data');
           } else {
-            return const NoDataWidget();
+            final electionJson = snapshot.data;
+            if (electionJson != null) {
+              Election storedElection = electionJson;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.av_timer_rounded,
+                    size: 80,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Your current status on joining the election:',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    storedElection.organization.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    storedElection.title.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 20),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 3.0, horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(100.0),
+                    ),
+                    child: const Text('Registering your details',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        )),
+                  ),
+                  const SizedBox(height: 10),
+                  // const Text(
+                  //   'We will send you an email to notify if you have been successfully registered',
+                  //   textAlign: TextAlign.center,
+                  // ),
+                ],
+              );
+            } else {
+              return const NoDataWidget();
+            }
           }
-        }
-      },
-    );
+        });
   }
 }
 

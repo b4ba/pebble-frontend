@@ -101,19 +101,18 @@ GoRouter appRouter = GoRouter(
           },
           routes: [
             GoRoute(
-                path: 'confirmation',
+                path: 'confirmation/:inputCode',
                 builder: (BuildContext context, GoRouterState state) {
-                  return const JoinConfirmation(
-                    isElection: false,
-                    inputCode: '123',
-                  );
+                  return JoinConfirmation(
+                      isElection: false, inputCode: state.params['inputCode']!);
                 },
                 routes: [
                   GoRoute(
-                    path: 'confirmed',
+                    path: 'confirmed/:electionId',
                     builder: (BuildContext context, GoRouterState state) {
-                      return const JoinConfirmed(
+                      return JoinConfirmed(
                         isElection: false,
+                        electionId: state.params['electionId']!,
                       );
                     },
                   ),
@@ -134,18 +133,19 @@ GoRouter appRouter = GoRouter(
           },
           routes: [
             GoRoute(
-                path: 'confirmation',
+                path: 'confirmation/:inputCode',
                 builder: (BuildContext context, GoRouterState state) {
-                  return const JoinConfirmation(
-                    isElection: true,
-                    inputCode: '123',
-                  );
+                  return JoinConfirmation(
+                      isElection: true, inputCode: state.params['inputCode']!);
                 },
                 routes: [
                   GoRoute(
-                    path: 'confirmed',
+                    path: 'confirmed/:electionId',
                     builder: (BuildContext context, GoRouterState state) {
-                      return const JoinConfirmed(isElection: true);
+                      return JoinConfirmed(
+                        isElection: true,
+                        electionId: state.params['electionId']!,
+                      );
                     },
                   ),
                 ]),

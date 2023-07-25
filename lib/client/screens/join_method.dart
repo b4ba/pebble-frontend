@@ -61,7 +61,8 @@ class _JoinMethodState extends State<JoinMethod> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      context.go('/register-organization/confirmation');
+                      context
+                          .go('/register-organization/confirmation/$inputCode');
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.blue),
@@ -167,17 +168,16 @@ class _JoinMethodState extends State<JoinMethod> {
                               //     endTime: format.parse((data['tallyStart'])));
 
                               // storeSecureJson('electionToJoin', elec.toJson());
-                              storeSecure('electionToJoinKey', inputCode);
-
                               if (response.statusCode == 200) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => JoinConfirmation(
-                                        isElection: true, inputCode: inputCode),
-                                  ),
-                                );
-                                // context.go('/register-election/confirmation');
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => JoinConfirmation(
+                                //         isElection: true, inputCode: inputCode),
+                                //   ),
+                                // );
+                                context.go(
+                                    '/register-election/confirmation/$inputCode');
                               } else {
                                 throw Exception('Failed to fetch data');
                               }
