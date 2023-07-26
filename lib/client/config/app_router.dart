@@ -15,6 +15,10 @@ import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ecclesia_ui/client/screens/join_confirmation.dart'
+    as join_confirmation;
+// import 'package:ecclesia_ui/client/screens/join_confirmed.dart'
+// as joinConfirmed;
 
 GoRouter appRouter = GoRouter(
   routes: <GoRoute>[
@@ -149,6 +153,11 @@ GoRouter appRouter = GoRouter(
                     },
                   ),
                 ]),
+            GoRoute(
+              path: 'no-data',
+              builder: (context, state) =>
+                  const join_confirmation.NoDataWidget(),
+            ),
             GoRoute(
               path: 'camera',
               builder: (BuildContext context, GoRouterState state) {
