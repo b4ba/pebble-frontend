@@ -90,8 +90,8 @@ class _JoinCameraState extends State<JoinCamera> {
 
                   // Proceed with registering for an invitation
                   Future.delayed(const Duration(seconds: 3), () {
-                    // TODO: Implementation for joining election <-- ADD HERE THE LOGIC FOR JOINING ELECTION
-                    context.go('/register-election/confirmation');
+                    context
+                        .go('/register-election/confirmation/${invitationID}');
                   });
 
                   // Check if the JSON contains an 'organizationID' key

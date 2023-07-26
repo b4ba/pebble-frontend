@@ -12,8 +12,6 @@ class Choice extends Equatable {
   final String description;
   final int numberOfVote;
   final String invitationId;
-  @Backlink(to: 'choices')
-  final election = IsarLinks<Election>();
 
   Choice({
     required this.title,

@@ -49,15 +49,7 @@ const ChoiceSchema = CollectionSchema(
   deserializeProp: _choiceDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {
-    r'election': LinkSchema(
-      id: -4755328055046535713,
-      name: r'election',
-      target: r'Election',
-      single: false,
-      linkName: r'choices',
-    )
-  },
+  links: {},
   embeddedSchemas: {},
   getId: _choiceGetId,
   getLinks: _choiceGetLinks,
@@ -133,12 +125,10 @@ Id _choiceGetId(Choice object) {
 }
 
 List<IsarLinkBase<dynamic>> _choiceGetLinks(Choice object) {
-  return [object.election];
+  return [];
 }
 
-void _choiceAttach(IsarCollection<dynamic> col, Id id, Choice object) {
-  object.election.attach(col, col.isar.collection<Election>(), r'election', id);
-}
+void _choiceAttach(IsarCollection<dynamic> col, Id id, Choice object) {}
 
 extension ChoiceQueryWhereSort on QueryBuilder<Choice, Choice, QWhere> {
   QueryBuilder<Choice, Choice, QAfterWhere> anyId() {
@@ -851,63 +841,7 @@ extension ChoiceQueryFilter on QueryBuilder<Choice, Choice, QFilterCondition> {
 
 extension ChoiceQueryObject on QueryBuilder<Choice, Choice, QFilterCondition> {}
 
-extension ChoiceQueryLinks on QueryBuilder<Choice, Choice, QFilterCondition> {
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> election(
-      FilterQuery<Election> q) {
-    return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'election');
-    });
-  }
-
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> electionLengthEqualTo(
-      int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'election', length, true, length, true);
-    });
-  }
-
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> electionIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'election', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> electionIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'election', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> electionLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'election', 0, true, length, include);
-    });
-  }
-
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> electionLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'election', length, include, 999999, true);
-    });
-  }
-
-  QueryBuilder<Choice, Choice, QAfterFilterCondition> electionLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'election', lower, includeLower, upper, includeUpper);
-    });
-  }
-}
+extension ChoiceQueryLinks on QueryBuilder<Choice, Choice, QFilterCondition> {}
 
 extension ChoiceQuerySortBy on QueryBuilder<Choice, Choice, QSortBy> {
   QueryBuilder<Choice, Choice, QAfterSortBy> sortByDescription() {

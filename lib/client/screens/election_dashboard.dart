@@ -34,170 +34,138 @@ class ElectionDashboard extends StatelessWidget {
         ..add(
             LoadElectionOverview(id: invitationId, userId: userId)), //! invId?
       child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 246, 248, 250),
-          appBar: const CustomAppBar(
-            back: true,
-            disableBackGuard: true,
-            disableMenu: false,
-          ),
-          endDrawer: const CustomDrawer(),
-          bottomNavigationBar:
-              BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
-            builder: (context, state) {
-              if (state is ElectionOverviewInitial) {
+        backgroundColor: const Color.fromARGB(255, 246, 248, 250),
+        appBar: const CustomAppBar(
+          back: true,
+          disableBackGuard: true,
+          disableMenu: false,
+        ),
+        endDrawer: const CustomDrawer(),
+        bottomNavigationBar:
+            BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
+          builder: (context, state) {
+            if (state is ElectionOverviewInitial) {
+              return const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: ElevatedButton(
+                  onPressed: null,
+                  child: Text('Start voting'),
+                ),
+              );
+            } else if (state is ElectionOverviewLoaded) {
+              goVote() {
+                context.go('/election-detail/$invitationId/$userId/voting');
+              }
+
+              goSeeResult() {
+                context.go('/election-detail/$invitationId/$userId/result');
+              }
+
+              if (state.status == ElectionStatusEnum.voteOpen ||
+                  state.status == ElectionStatusEnum.voteEnding) {
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: ElevatedButton(
+                    onPressed: goVote,
+                    child: const Text('Start voting'),
+                  ),
+                );
+              } else if (state.status == ElectionStatusEnum.voted) {
                 return const Padding(
                   padding: EdgeInsets.all(20.0),
                   child: ElevatedButton(
-                    onPressed: null,
-                    child: Text('Start voting'),
-                  ),
+                      onPressed: null, child: Text('See result')),
                 );
-              } else if (state is ElectionOverviewLoaded) {
-                goVote() {
-                  context.go('/election-detail/$invitationId/${userId}/voting');
-                }
-
-                goSeeResult() {
-                  context.go('/election-detail/$invitationId/$userId/result');
-                }
-
-                if (state.status == ElectionStatusEnum.voteOpen ||
-                    state.status == ElectionStatusEnum.voteEnding) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ElevatedButton(
-                      onPressed: goVote,
-                      child: const Text('Start voting'),
-                    ),
-                  );
-                } else if (state.status == ElectionStatusEnum.voted) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: ElevatedButton(
-                        onPressed: null, child: Text('See result')),
-                  );
-                } else if (state.status == ElectionStatusEnum.voteClosed) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: ElevatedButton(
-                        onPressed: goSeeResult,
-                        child: const Text('See result')),
-                  );
-                } else {
-                  return const Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: ElevatedButton(
-                        onPressed: null, child: Text('Start voting')),
-                  );
-                }
+              } else if (state.status == ElectionStatusEnum.voteClosed) {
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: ElevatedButton(
+                      onPressed: goSeeResult, child: const Text('See result')),
+                );
               } else {
-                return const Text("Something is wrong =(");
+                return const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: ElevatedButton(
+                      onPressed: null, child: Text('Start voting')),
+                );
               }
-            },
-          ),
-          body: RefreshIndicator(
-            onRefresh: () {
-              return Future.delayed(const Duration(seconds: 2), (() {
-                context.read<ElectionOverviewBloc>().add(
-                    RefreshElectionOverview(id: invitationId, userId: userId));
-              }));
-            },
-            child: ListView(
-              children: [
-                FutureBuilder<Election?>(
-                    future: isarService.getElectionByInvitationId(invitationId),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return const Text('Error fetching data');
+            } else {
+              return const Text("Something is wrong =(");
+            }
+          },
+        ),
+        body: RefreshIndicator(
+          onRefresh: () {
+            return Future.delayed(const Duration(seconds: 2), (() {
+              context.read<ElectionOverviewBloc>().add(
+                  RefreshElectionOverview(id: invitationId, userId: userId));
+            }));
+          },
+          child: ListView(
+            children: [
+              FutureBuilder<Election?>(
+                  future: isarService.getElectionByInvitationId(invitationId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return const Text('Error fetching data');
+                    } else {
+                      final electionJson = snapshot.data;
+                      if (electionJson != null) {
+                        return ElectionStatus(
+                          title: electionJson.title,
+                          description: electionJson.description,
+                          organization: electionJson.organization,
+                          status: getElectionStatus(
+                              electionJson.startTime, electionJson.endTime),
+                          startTime: electionJson.startTime,
+                          endTime: electionJson.endTime,
+                        );
                       } else {
-                        final electionJson = snapshot.data;
-                        if (electionJson != null) {
-                          return ElectionStatus(
-                            title: electionJson.title,
-                            description: electionJson.description,
-                            organization: electionJson.organization,
-                            status: getElectionStatus(
-                                electionJson.startTime, electionJson.endTime),
-                            startTime: electionJson.startTime,
-                            endTime: electionJson.endTime,
-                          );
-                        } else {
-                          return const Text('Failed to fetch this election');
-                        }
+                        return const Text('Failed to fetch this election');
                       }
-                    }),
-                // BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
-                //   builder: (context, state) {
-                //     if (state is ElectionOverviewInitial) {
-                //       return const CircularProgressIndicator(
-                //         color: Colors.blue,
-                //       );
-                //     } else if (state is ElectionOverviewLoaded) {
-                //       final fetchedElec = isarService
-                //           .getElectionById(state.election.id.toString());
-                //       if (fetchedElec != null) {
-                //         return ElectionStatus(
-                //           title: fetchedElec.title,
-                //           description: fetchedElec.description,
-                //           organization: fetchedElec.organization,
-                //           status: state.status,
-                //           startTime: fetchedElec.startTime,
-                //           endTime: fetchedElec.endTime,
-                //         );
-                //         // return ElectionStatus(
-                //         //   title: state.election.title,
-                //         //   description: state.election.description,
-                //         //   organization: state.election.organization,
-                //         //   status: state.status,
-                //         //   startTime: state.election.startTime,
-                //         //   endTime: state.election.endTime,
-                //         // );
-                //       } else {
-                //         return const Text('Failed to fetch this election');
-                //       }
-                //     } else {
-                //       return const Text('Something is wrong');
-                //     }
-                //   },
-                // ),
-                BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
-                  builder: (context, state) {
-                    if (state is ElectionOverviewInitial) {
-                      return const CircularProgressIndicator(
+                    }
+                  }),
+              BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
+                builder: (context, state) {
+                  if (state is ElectionOverviewInitial) {
+                    return const Column(children: [
+                      CircularProgressIndicator(
                         color: Colors.blue,
-                      );
-                    } else if (state is ElectionOverviewLoaded) {
-                      return ElectionDescription(
-                        description: state.election.description,
-                      );
-                    } else {
-                      return const Text('Something is wrong');
-                    }
-                  },
-                ),
-                VotingOptions(id: invitationId, userId: userId),
-                BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
-                  builder: (context, state) {
-                    if (state is ElectionOverviewInitial) {
-                      return const CircularProgressIndicator(
-                          color: Colors.blue);
-                    } else if (state is ElectionOverviewLoaded) {
-                      bool castedStatus =
-                          state.status == ElectionStatusEnum.voted ||
-                              state.status == ElectionStatusEnum.voteClosed;
-                      return castedStatus
-                          ? VoteCasted(id: invitationId, userId: userId)
-                          : const SizedBox();
-                    } else {
-                      return const Text('Something is wrong');
-                    }
-                  },
-                ),
-              ],
-            ),
-          )),
+                      ),
+                      Text('Loading...'),
+                    ]);
+                  } else if (state is ElectionOverviewLoaded) {
+                    return ElectionDescription(
+                      description: state.election.description,
+                    );
+                  } else {
+                    return const Text('Something is wrong');
+                  }
+                },
+              ),
+              VotingOptions(id: invitationId, userId: userId),
+              BlocBuilder<ElectionOverviewBloc, ElectionOverviewState>(
+                builder: (context, state) {
+                  if (state is ElectionOverviewInitial) {
+                    return const CircularProgressIndicator(color: Colors.blue);
+                  } else if (state is ElectionOverviewLoaded) {
+                    bool castedStatus =
+                        state.status == ElectionStatusEnum.voted ||
+                            state.status == ElectionStatusEnum.voteClosed;
+                    return castedStatus
+                        ? VoteCasted(id: invitationId, userId: userId)
+                        : const SizedBox();
+                  } else {
+                    return const Text('Something is wrong');
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -331,7 +299,7 @@ class VotingOptions extends StatelessWidget {
               if (state is ElectionOverviewInitial) {
                 return const CircularProgressIndicator(color: Colors.blue);
               } else if (state is ElectionOverviewLoaded) {
-                Iterable<VoteChoiceRow> rows = state.election.choices.map(
+                Iterable<VoteChoiceRow> rows = state.choices.map(
                   (choice) =>
                       VoteChoiceRow(choice: choice, id: id, userId: userId),
                 );

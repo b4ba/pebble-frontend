@@ -10,6 +10,11 @@ class ElectionOverviewLoaded extends ElectionOverviewState {
   final Election election;
   final ElectionStatusEnum status;
   final String id;
+  final List<Choice> choices;
 
-  const ElectionOverviewLoaded({required this.election, required this.status, required this.id});
+  const ElectionOverviewLoaded(
+      {required this.election,
+      required this.status,
+      required this.id,
+      required this.choices});
 }

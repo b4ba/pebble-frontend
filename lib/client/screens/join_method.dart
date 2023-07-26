@@ -61,8 +61,7 @@ class _JoinMethodState extends State<JoinMethod> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      context
-                          .go('/register-organization/confirmation/$inputCode');
+                      context.go('/register-election/confirmation/$inputCode');
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.blue),
@@ -145,15 +144,8 @@ class _JoinMethodState extends State<JoinMethod> {
                         ElevatedButton(
                           onPressed: () async {
                             if (widget.isElection) {
-                              // final response = await http.get(Uri.parse(
-                              //     'http://localhost:8080/api/election/info/$inputCode'));
-
-                              // if (response.statusCode == 200) {
                               context.go(
                                   '/register-election/confirmation/$inputCode');
-                              // } else {
-                              //   throw Exception('Failed to fetch data');
-                              // }
                             } else {
                               // TODO: This is hard-coded and should be change
                               if (inputCode == 'edinburghuni432') {
@@ -199,18 +191,19 @@ class _JoinMethodState extends State<JoinMethod> {
 
                         // Comment this in to enable scanning from gallery
 
-                        // ElevatedButton(
-                        //   onPressed: () {
-                        //     debugPrint('Gallery Open');
-                        //     getImage(false);
-                        //   },
-                        //   style: ButtonStyle(
-                        //     backgroundColor: MaterialStateProperty.all(Colors.black),
-                        //   ),
-                        //   child: const Text(
-                        //     'Scan QR code using gallery',
-                        //   ),
-                        // ),
+                        ElevatedButton(
+                          onPressed: () {
+                            debugPrint('Gallery Open');
+                            getImage(false);
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.black),
+                          ),
+                          child: const Text(
+                            'Scan QR code using gallery',
+                          ),
+                        ),
                       ],
                     ),
                   ],

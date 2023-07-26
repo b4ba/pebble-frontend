@@ -41,11 +41,11 @@ class IsarService {
     // initialReturn: true
   }
 
-  Future<List<Choice>> getChoicesFor(Election election) async {
+  Future<List<Choice>> getChoicesFor(String invitationKey) async {
     final isar = await db;
     return await isar.choices
         .filter()
-        .election((q) => q.idEqualTo(election.id))
+        .invitationIdEqualTo(invitationKey)
         .findAll();
   }
 

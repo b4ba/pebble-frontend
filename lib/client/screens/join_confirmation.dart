@@ -42,6 +42,7 @@ class JoinConfirmation extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   if (isElection) {
+                    print("JOINED supposedly");
                     final response = await http.get(Uri.parse(
                         'http://localhost:8080/api/election/join/$inputCode'));
                     print(response.statusCode);
@@ -72,6 +73,7 @@ class JoinConfirmation extends StatelessWidget {
                           .toList();
                       isarService.addElection(elec);
                       for (var choice in choices) {
+                        print(choice);
                         isarService.addChoice(choice);
                       }
                       Navigator.push(
@@ -188,22 +190,6 @@ class JoinElectionConfirmation extends StatelessWidget {
         endTime: DateTime.now(),
         invitationId: inputCode);
   }
-
-  // DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
-  // List<Choice> choices = data['choices']
-  //     .map<Choice>((choice) => Choice(
-  //           title: choice.toString(),
-  //           description: '$choice description',
-  //           numberOfVote: 0,
-  //         ))
-  //     .toList();
-
-  // final elec = Election(
-  //     title: data['title'],
-  //     description: data['description'],
-  //     organization: 'organization',
-  //     startTime: format.parse((data['castStart'])),
-  //     endTime: format.parse((data['tallyStart'])));
 
   @override
   Widget build(BuildContext context) {
