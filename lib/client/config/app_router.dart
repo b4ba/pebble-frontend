@@ -64,7 +64,7 @@ GoRouter appRouter = GoRouter(
                 path: 'voting',
                 builder: (BuildContext context, GoRouterState state) {
                   return Voting(
-                      id: state.params['electionId']!,
+                      id: state.params['invitationId']!,
                       userId: state.params['userId']!);
                 },
                 routes: [
@@ -72,7 +72,7 @@ GoRouter appRouter = GoRouter(
                     path: 'voting-casted',
                     builder: (BuildContext context, GoRouterState state) {
                       return VotingCasted(
-                          id: state.params['electionId']!,
+                          id: state.params['invitationId']!,
                           userId: state.params['userId']!);
                     },
                   )
@@ -82,7 +82,7 @@ GoRouter appRouter = GoRouter(
               path: 'result',
               builder: (BuildContext context, GoRouterState state) {
                 return Result(
-                    id: state.params['electionId']!,
+                    id: state.params['invitationId']!,
                     userId: state.params['userId']!);
               },
             ),
@@ -91,9 +91,9 @@ GoRouter appRouter = GoRouter(
                 path: 'info/:choiceId',
                 builder: (BuildContext context, GoRouterState state) {
                   return ChoiceInfo(
-                      id: state.params['electionId']!,
+                      id: state.params['invitationId']!,
                       userId: state.params['userId']!,
-                      choiceId: state.params['choiceId']!);
+                      title: state.params['choiceId']!);
                 })
           ],
         ),

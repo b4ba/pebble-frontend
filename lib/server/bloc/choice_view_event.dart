@@ -5,9 +5,10 @@ abstract class ChoiceViewEvent {
 }
 
 class LoadChoiceView extends ChoiceViewEvent {
-  final String choiceId;
+  final String title;
   final String electionId;
   final String userId;
 
-  const LoadChoiceView({required this.choiceId, required this.electionId, required this.userId});
+  const LoadChoiceView(
+      {required this.title, required this.electionId, required this.userId});
 }

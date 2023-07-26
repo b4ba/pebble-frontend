@@ -17,28 +17,33 @@ const ChoiceSchema = CollectionSchema(
   name: r'Choice',
   id: 6254381271702497457,
   properties: {
-    r'description': PropertySchema(
+    r'choiceId': PropertySchema(
       id: 0,
+      name: r'choiceId',
+      type: IsarType.long,
+    ),
+    r'description': PropertySchema(
+      id: 1,
       name: r'description',
       type: IsarType.string,
     ),
     r'invitationId': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'invitationId',
       type: IsarType.string,
     ),
     r'numberOfVote': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'numberOfVote',
       type: IsarType.long,
     ),
     r'props': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'props',
       type: IsarType.longList,
     ),
     r'title': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'title',
       type: IsarType.string,
     )
@@ -76,11 +81,12 @@ void _choiceSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.description);
-  writer.writeString(offsets[1], object.invitationId);
-  writer.writeLong(offsets[2], object.numberOfVote);
-  writer.writeLongList(offsets[3], object.props);
-  writer.writeString(offsets[4], object.title);
+  writer.writeLong(offsets[0], object.choiceId);
+  writer.writeString(offsets[1], object.description);
+  writer.writeString(offsets[2], object.invitationId);
+  writer.writeLong(offsets[3], object.numberOfVote);
+  writer.writeLongList(offsets[4], object.props);
+  writer.writeString(offsets[5], object.title);
 }
 
 Choice _choiceDeserialize(
@@ -90,10 +96,10 @@ Choice _choiceDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Choice(
-    description: reader.readString(offsets[0]),
-    invitationId: reader.readString(offsets[1]),
-    numberOfVote: reader.readLong(offsets[2]),
-    title: reader.readString(offsets[4]),
+    description: reader.readString(offsets[1]),
+    invitationId: reader.readString(offsets[2]),
+    numberOfVote: reader.readLong(offsets[3]),
+    title: reader.readString(offsets[5]),
   );
   return object;
 }
@@ -106,14 +112,16 @@ P _choiceDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readLong(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readLongList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 4:
+      return (reader.readLongList(offset) ?? []) as P;
+    case 5:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -206,6 +214,59 @@ extension ChoiceQueryWhere on QueryBuilder<Choice, Choice, QWhereClause> {
 }
 
 extension ChoiceQueryFilter on QueryBuilder<Choice, Choice, QFilterCondition> {
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> choiceIdEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'choiceId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> choiceIdGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'choiceId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> choiceIdLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'choiceId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> choiceIdBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'choiceId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Choice, Choice, QAfterFilterCondition> descriptionEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -844,6 +905,18 @@ extension ChoiceQueryObject on QueryBuilder<Choice, Choice, QFilterCondition> {}
 extension ChoiceQueryLinks on QueryBuilder<Choice, Choice, QFilterCondition> {}
 
 extension ChoiceQuerySortBy on QueryBuilder<Choice, Choice, QSortBy> {
+  QueryBuilder<Choice, Choice, QAfterSortBy> sortByChoiceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'choiceId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterSortBy> sortByChoiceIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'choiceId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Choice, Choice, QAfterSortBy> sortByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -894,6 +967,18 @@ extension ChoiceQuerySortBy on QueryBuilder<Choice, Choice, QSortBy> {
 }
 
 extension ChoiceQuerySortThenBy on QueryBuilder<Choice, Choice, QSortThenBy> {
+  QueryBuilder<Choice, Choice, QAfterSortBy> thenByChoiceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'choiceId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterSortBy> thenByChoiceIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'choiceId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Choice, Choice, QAfterSortBy> thenByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -956,6 +1041,12 @@ extension ChoiceQuerySortThenBy on QueryBuilder<Choice, Choice, QSortThenBy> {
 }
 
 extension ChoiceQueryWhereDistinct on QueryBuilder<Choice, Choice, QDistinct> {
+  QueryBuilder<Choice, Choice, QDistinct> distinctByChoiceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'choiceId');
+    });
+  }
+
   QueryBuilder<Choice, Choice, QDistinct> distinctByDescription(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -994,6 +1085,12 @@ extension ChoiceQueryProperty on QueryBuilder<Choice, Choice, QQueryProperty> {
   QueryBuilder<Choice, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Choice, int, QQueryOperations> choiceIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'choiceId');
     });
   }
 

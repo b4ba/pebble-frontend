@@ -6,7 +6,6 @@ import 'package:ecclesia_ui/server/bloc/joined_elections_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:ecclesia_ui/server/bloc/picked_choice_bloc.dart';
 import 'package:ecclesia_ui/services/app_initializer.dart';
-import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

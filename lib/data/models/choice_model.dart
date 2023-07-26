@@ -1,4 +1,3 @@
-import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:isar/isar.dart';
 
@@ -8,6 +7,7 @@ part 'choice_model.g.dart';
 @Collection(inheritance: false)
 class Choice extends Equatable {
   final Id id = Isar.autoIncrement;
+  final int choiceId = Isar.autoIncrement;
   final String title;
   final String description;
   final int numberOfVote;

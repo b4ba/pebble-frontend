@@ -155,7 +155,7 @@ class ElectionDashboard extends StatelessWidget {
                         state.status == ElectionStatusEnum.voted ||
                             state.status == ElectionStatusEnum.voteClosed;
                     return castedStatus
-                        ? VoteCasted(id: invitationId, userId: userId)
+                        ? VoteCasted(invitationId: invitationId, userId: userId)
                         : const SizedBox();
                   } else {
                     return const Text('Something is wrong');
@@ -205,11 +205,11 @@ class ElectionDescription extends StatelessWidget {
 
 class VoteCasted extends StatelessWidget {
   final String userId;
-  final String id;
+  final String invitationId;
 
   const VoteCasted({
     Key? key,
-    required this.id,
+    required this.invitationId,
     required this.userId,
   }) : super(key: key);
 
@@ -228,10 +228,16 @@ class VoteCasted extends StatelessWidget {
           BlocBuilder<LoggedUserBloc, LoggedUserState>(
             builder: (context, state) {
               if (state is LoggedUserLoaded) {
-                final Election election = Election.elections[int.parse(id)];
                 return VoteChoiceRow(
-                    choice: state.user.votedChoices[election],
-                    id: id,
+                    // choice: state.user.votedChoices[election],
+                    // final election =
+                    //     IsarService().getElectionByInvitationId(invitationId);
+                    choice: Choice(
+                        title: 'Mock choice',
+                        description: 'Mock description',
+                        invitationId: 'mockInvId',
+                        numberOfVote: 1),
+                    id: invitationId, // not how it should be but
                     userId: userId);
               } else {
                 return const Text('There is something wrong');
@@ -304,11 +310,6 @@ class VotingOptions extends StatelessWidget {
                       VoteChoiceRow(choice: choice, id: id, userId: userId),
                 );
                 return Column(children: rows.toList(growable: false));
-                // return Column(children: const [
-                //   VoteChoiceRow(title: 'James Cameron'),
-                //   VoteChoiceRow(title: 'Susan Matthew'),
-                //   VoteChoiceRow(title: 'Yanning Li'),
-                // ]);
               } else {
                 return const Text('Something is wrong');
               }
@@ -321,7 +322,7 @@ class VotingOptions extends StatelessWidget {
 }
 
 class VoteChoiceRow extends StatelessWidget {
-  final Choice? choice;
+  final Choice choice;
   final String id;
   final String userId;
 
@@ -345,10 +346,10 @@ class VoteChoiceRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(choice!.title),
+          Text(choice.title),
           IconButton(
               onPressed: () {
-                context.go('/election-detail/$id/$userId/info/${choice!.id}');
+                context.go('/election-detail/$id/$userId/info/${choice.title}');
                 debugPrint('Open info about a choice');
               },
               icon: const Icon(Icons.info))
