@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:scan/scan.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -194,7 +195,8 @@ class _JoinMethodState extends State<JoinMethod> {
                         ElevatedButton(
                           onPressed: () {
                             debugPrint('Gallery Open');
-                            getImage(false);
+                            scanQRFromGallery();
+                            // getImage(false);
                           },
                           style: ButtonStyle(
                             backgroundColor:
@@ -211,5 +213,30 @@ class _JoinMethodState extends State<JoinMethod> {
         ),
       ),
     );
+  }
+
+  Future<void> scanQRFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final qrText = await Scan.parse(pickedFile.path);
+      final inputCode =
+          qrText; // Extract the invitationID from the QR code text
+      if (inputCode != null) {
+        final data = jsonDecode(inputCode);
+        // Check if the JSON contains an 'invitationID' key
+        if (data.containsKey('invitationID')) {
+          // Extract the invitationID
+          String invitationID = data['invitationID'];
+          // Proceed with registering for an invitation
+          Future.delayed(const Duration(seconds: 3), () {
+            context.go('/register-election/confirmation/$invitationID');
+          });
+        }
+      } else {
+        print('InvitationID is null!');
+      }
+    }
   }
 }

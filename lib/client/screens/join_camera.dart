@@ -120,33 +120,6 @@ class _JoinCameraState extends State<JoinCamera> {
                     });
                   });
                 }
-
-                // if (widget.isElection && code == "joinElection") {
-                //   Future.delayed(const Duration(seconds: 3), () {
-                //     // TODO: Implementation for joining election
-                //     context.go('/register-election/confirmation');
-                //   });
-                // } else if (!widget.isElection && code == "joinOrganization") {
-                //   Future.delayed(const Duration(seconds: 3), () {
-                //     // TODO: Implementation for joining organization
-                //     context.go('/register-organization/confirmation');
-                //   });
-                // } else {
-                //   Future.delayed(const Duration(seconds: 3), () {
-                //     setState(() {
-                //       _fetching = false;
-                //       _scannedString =
-                //           "Invalid QR code. Please try another one";
-                //       _visible = true;
-                //     });
-
-                //     Future.delayed(const Duration(seconds: 3), () {
-                //       setState(() {
-                //         _visible = false;
-                //       });
-                //     });
-                //   });
-                // }
               } catch (e) {
                 // Handle any errors that occur during the JSON parsing process
                 print('Error parsing QR code: $e');
