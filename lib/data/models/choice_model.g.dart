@@ -22,18 +22,23 @@ const ChoiceSchema = CollectionSchema(
       name: r'description',
       type: IsarType.string,
     ),
-    r'numberOfVote': PropertySchema(
+    r'invitationId': PropertySchema(
       id: 1,
+      name: r'invitationId',
+      type: IsarType.string,
+    ),
+    r'numberOfVote': PropertySchema(
+      id: 2,
       name: r'numberOfVote',
       type: IsarType.long,
     ),
     r'props': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'props',
       type: IsarType.longList,
     ),
     r'title': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'title',
       type: IsarType.string,
     )
@@ -67,6 +72,7 @@ int _choiceEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.description.length * 3;
+  bytesCount += 3 + object.invitationId.length * 3;
   bytesCount += 3 + object.props.length * 8;
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
@@ -79,9 +85,10 @@ void _choiceSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.description);
-  writer.writeLong(offsets[1], object.numberOfVote);
-  writer.writeLongList(offsets[2], object.props);
-  writer.writeString(offsets[3], object.title);
+  writer.writeString(offsets[1], object.invitationId);
+  writer.writeLong(offsets[2], object.numberOfVote);
+  writer.writeLongList(offsets[3], object.props);
+  writer.writeString(offsets[4], object.title);
 }
 
 Choice _choiceDeserialize(
@@ -92,8 +99,9 @@ Choice _choiceDeserialize(
 ) {
   final object = Choice(
     description: reader.readString(offsets[0]),
-    numberOfVote: reader.readLong(offsets[1]),
-    title: reader.readString(offsets[3]),
+    invitationId: reader.readString(offsets[1]),
+    numberOfVote: reader.readLong(offsets[2]),
+    title: reader.readString(offsets[4]),
   );
   return object;
 }
@@ -108,10 +116,12 @@ P _choiceDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readLong(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readLongList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 3:
+      return (reader.readLongList(offset) ?? []) as P;
+    case 4:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -384,6 +394,136 @@ extension ChoiceQueryFilter on QueryBuilder<Choice, Choice, QFilterCondition> {
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'invitationId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'invitationId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'invitationId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'invitationId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterFilterCondition> invitationIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'invitationId',
+        value: '',
       ));
     });
   }
@@ -782,6 +922,18 @@ extension ChoiceQuerySortBy on QueryBuilder<Choice, Choice, QSortBy> {
     });
   }
 
+  QueryBuilder<Choice, Choice, QAfterSortBy> sortByInvitationId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterSortBy> sortByInvitationIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Choice, Choice, QAfterSortBy> sortByNumberOfVote() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'numberOfVote', Sort.asc);
@@ -832,6 +984,18 @@ extension ChoiceQuerySortThenBy on QueryBuilder<Choice, Choice, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Choice, Choice, QAfterSortBy> thenByInvitationId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Choice, Choice, QAfterSortBy> thenByInvitationIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'invitationId', Sort.desc);
+    });
+  }
+
   QueryBuilder<Choice, Choice, QAfterSortBy> thenByNumberOfVote() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'numberOfVote', Sort.asc);
@@ -865,6 +1029,13 @@ extension ChoiceQueryWhereDistinct on QueryBuilder<Choice, Choice, QDistinct> {
     });
   }
 
+  QueryBuilder<Choice, Choice, QDistinct> distinctByInvitationId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'invitationId', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Choice, Choice, QDistinct> distinctByNumberOfVote() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'numberOfVote');
@@ -895,6 +1066,12 @@ extension ChoiceQueryProperty on QueryBuilder<Choice, Choice, QQueryProperty> {
   QueryBuilder<Choice, String, QQueryOperations> descriptionProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'description');
+    });
+  }
+
+  QueryBuilder<Choice, String, QQueryOperations> invitationIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'invitationId');
     });
   }
 

@@ -9,7 +9,6 @@ import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -54,13 +53,6 @@ class JoinConfirmation extends StatelessWidget {
                       final data = jsonDecode(elecInfoResponse.body);
 
                       DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
-                      List<Choice> choices = data['choices']
-                          .map<Choice>((choice) => Choice(
-                                title: choice.toString(),
-                                description: '$choice description',
-                                numberOfVote: 0,
-                              ))
-                          .toList();
 
                       final elec = Election(
                           title: data['title'],
@@ -70,7 +62,18 @@ class JoinConfirmation extends StatelessWidget {
                           endTime: format.parse((data['tallyStart'])),
                           invitationId: inputCode);
 
+                      List<Choice> choices = data['choices']
+                          .map<Choice>((choice) => Choice(
+                                title: choice.toString(),
+                                description: '$choice description',
+                                numberOfVote: 0,
+                                invitationId: elec.invitationId,
+                              ))
+                          .toList();
                       isarService.addElection(elec);
+                      for (var choice in choices) {
+                        isarService.addChoice(choice);
+                      }
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -82,7 +85,8 @@ class JoinConfirmation extends StatelessWidget {
                       );
                       // context.go('/register-election/confirmed/$inputCode');
                     } else {
-                      context.go('/register-election/failed');
+                      print('ERROR JOINING ELECTION');
+                      context.go('/');
                       return;
                     }
                     // context
@@ -173,14 +177,6 @@ class JoinElectionConfirmation extends StatelessWidget {
         invitationId: inputCode,
       );
 
-      List<Choice> choices = electionData['choices']
-          .map<Choice>((choice) => Choice(
-                title: choice.toString(),
-                description: '$choice description',
-                numberOfVote: 0,
-              ))
-          .toList();
-
       return elec;
     }
     print('data is null');
@@ -241,7 +237,7 @@ class JoinElectionConfirmation extends StatelessWidget {
                     style: const TextStyle(fontSize: 18),
                   ),
                   Text(
-                    election!.title.toString(),
+                    election.title.toString(),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 25),
