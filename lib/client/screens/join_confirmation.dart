@@ -45,6 +45,8 @@ class JoinConfirmation extends StatelessWidget {
                   if (isElection) {
                     final response = await http.get(Uri.parse(
                         'http://localhost:8080/api/election/join/$inputCode'));
+                    print(response.statusCode);
+                    print(response.body);
                     if (response.statusCode == 200) {
                       final elecInfoResponse = await http.get(Uri.parse(
                           'http://localhost:8080/api/election/info/$inputCode'));

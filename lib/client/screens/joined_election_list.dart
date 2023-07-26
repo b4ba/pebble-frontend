@@ -81,50 +81,30 @@ class JoinedElectionList extends StatelessWidget {
                                               election.endTime) ==
                                           ElectionStatusEnum.voteClosed)
                                       .toList();
-                                  return ListView.builder(
-                                      itemCount: justEndedElections.length,
-                                      itemBuilder: (context, index) {
-                                        return ElectionCard(
-                                          electionDescription:
-                                              justEndedElections[index]
-                                                  .description,
-                                          electionOrganization:
-                                              justEndedElections[index]
-                                                  .organization,
-                                          electionTitle:
-                                              justEndedElections[index].title,
-                                          id: justEndedElections[index]
-                                              .invitationId,
-                                          status: getElectionStatus(
-                                              justEndedElections[index]
-                                                  .startTime,
-                                              justEndedElections[index]
-                                                  .endTime),
-                                          userId: '1',
-                                        );
-                                      });
-
-                                  // justEndedElections
-                                  //     .where((election) =>
-                                  //         getElectionStatus(election.startTime,
-                                  //             election.endTime) ==
-                                  //         ElectionStatusEnum.voteClosed)
-                                  //     .toList();
-                                  // // Display the ElectionCard for the just ended election
-                                  // return ElectionCard(
-                                  //   id: justEndedElections.first.invitationId,
-                                  //   electionTitle:
-                                  //       justEndedElections.first.title,
-                                  //   electionDescription:
-                                  //       justEndedElections.first.description,
-                                  //   electionOrganization:
-                                  //       justEndedElections.first.organization,
-                                  //   status: getElectionStatus(
-                                  //       justEndedElections.first.startTime,
-                                  //       justEndedElections.first.endTime),
-                                  //   // userId: user.id,
-                                  //   userId: user.id,
-                                  // );
+                                  return Expanded(
+                                      child: ListView.builder(
+                                          itemCount: justEndedElections.length,
+                                          itemBuilder: (context, index) {
+                                            return ElectionCard(
+                                              electionDescription:
+                                                  justEndedElections[index]
+                                                      .description,
+                                              electionOrganization:
+                                                  justEndedElections[index]
+                                                      .organization,
+                                              electionTitle:
+                                                  justEndedElections[index]
+                                                      .title,
+                                              id: justEndedElections[index]
+                                                  .invitationId,
+                                              status: getElectionStatus(
+                                                  justEndedElections[index]
+                                                      .startTime,
+                                                  justEndedElections[index]
+                                                      .endTime),
+                                              userId: '1',
+                                            );
+                                          }));
                                 } else {
                                   return const Text(
                                       'No just ended elections a1');
@@ -166,44 +146,68 @@ class JoinedElectionList extends StatelessWidget {
                               } else if (snapshot.hasError) {
                                 return const Text('Error fetching data');
                               } else {
-                                final justEndedElections = snapshot.data;
-                                if (justEndedElections != null) {
-                                  if (justEndedElections.isNotEmpty) {
-                                    justEndedElections
+                                final elections = snapshot.data;
+                                if (elections != null) {
+                                  if (elections.isNotEmpty) {
+                                    final justEndedElections = elections
                                         .where((election) =>
                                             getElectionStatus(
                                                 election.startTime,
                                                 election.endTime) !=
                                             ElectionStatusEnum.voteClosed)
                                         .toList();
-
                                     return Expanded(
                                         child: ListView.builder(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 100),
-                                            itemCount: state.elections.length,
-                                            itemBuilder: (_, index) {
-                                              Election key = state
-                                                  .elections.keys
-                                                  .elementAt(index);
-
-                                              if (state.elections[key] ==
-                                                  ElectionStatusEnum
-                                                      .voteClosed) {
-                                                return Container();
-                                              }
-
+                                            itemCount:
+                                                justEndedElections.length,
+                                            itemBuilder: (context, index) {
                                               return ElectionCard(
-                                                id: key.invitationId,
-                                                electionTitle: key.title,
                                                 electionDescription:
-                                                    key.description,
+                                                    justEndedElections[index]
+                                                        .description,
                                                 electionOrganization:
-                                                    key.organization,
-                                                status: state.elections[key]!,
-                                                userId: user.id,
+                                                    justEndedElections[index]
+                                                        .organization,
+                                                electionTitle:
+                                                    justEndedElections[index]
+                                                        .title,
+                                                id: justEndedElections[index]
+                                                    .invitationId,
+                                                status: getElectionStatus(
+                                                    justEndedElections[index]
+                                                        .startTime,
+                                                    justEndedElections[index]
+                                                        .endTime),
+                                                userId: '1',
                                               );
                                             }));
+                                    // return Expanded(
+                                    //     child: ListView.builder(
+                                    //         padding: const EdgeInsets.only(
+                                    //             bottom: 100),
+                                    //         itemCount: state.elections.length,
+                                    //         itemBuilder: (_, index) {
+                                    //           Election key = state
+                                    //               .elections.keys
+                                    //               .elementAt(index);
+
+                                    //           if (state.elections[key] ==
+                                    //               ElectionStatusEnum
+                                    //                   .voteClosed) {
+                                    //             return Container();
+                                    //           }
+
+                                    //           return ElectionCard(
+                                    //             id: key.invitationId,
+                                    //             electionTitle: key.title,
+                                    //             electionDescription:
+                                    //                 key.description,
+                                    //             electionOrganization:
+                                    //                 key.organization,
+                                    //             status: state.elections[key]!,
+                                    //             userId: user.id,
+                                    //           );
+                                    //         }));
                                   } else {
                                     return const Text(
                                         'No just ended elections b1');
