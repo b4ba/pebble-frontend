@@ -30,6 +30,8 @@ class _VotingState extends State<Voting> {
   Choice selectedChoice = Choice.noVote;
 
   void changeSelection(value, choice) {
+    // we could change this to actually send the vote to the server.
+    // we would only need the server to send votes for elections having ended
     setState(() {
       _chosenOptions = value;
       selectedChoice = choice;
@@ -275,12 +277,12 @@ class VotingPicker extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                    itemCount: state.election.choices.length,
+                    itemCount: state.choices.length,
                     itemBuilder: (_, index) {
-                      Choice choice = state.election.choices.elementAt(index);
+                      Choice choice = state.choices[index];
                       return CustomRadioListTile(
                         choice: choice,
-                        value: choice.id.toString(),
+                        value: choice.title.toString(),
                         groupValue: chosenOption,
                         onChanged: (value, choice) {
                           // debugPrint(value);

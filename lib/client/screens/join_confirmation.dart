@@ -9,6 +9,7 @@ import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -42,11 +43,8 @@ class JoinConfirmation extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   if (isElection) {
-                    print("JOINED supposedly");
                     final response = await http.get(Uri.parse(
                         'http://localhost:8080/api/election/join/$inputCode'));
-                    print(response.statusCode);
-                    print(response.body);
                     if (response.statusCode == 200) {
                       final elecInfoResponse = await http.get(Uri.parse(
                           'http://localhost:8080/api/election/info/$inputCode'));
@@ -91,14 +89,38 @@ class JoinConfirmation extends StatelessWidget {
                       context.go('/');
                       return;
                     }
-                    // context
-                    //     .read<LoggedUserBloc>()
-                    //     .add(const JoinElectionLoggedUserEvent(id: '4'));
                   } else {
-                    // context.read<LoggedUserBloc>().add(
-                    //     const JoinOrganizationLoggedUserEvent(
-                    //         organizationId: '3'));
-                    context.go('/register-organization/confirmation/confirmed');
+                    const storage = FlutterSecureStorage();
+                    final publicKey = await storage.read(key: 'publicKey');
+                    final jsonData = jsonEncode({'pk': publicKey});
+
+                    try {
+                      final response = await http.post(
+                        Uri.parse(
+                            'http://localhost:8080/register-organization'),
+                        headers: {'Content-Type': 'application/json'},
+                        body: jsonData,
+                      );
+                      if (response.statusCode == 200) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => JoinConfirmed(
+                              isElection: false,
+                              invitationId: inputCode,
+                            ),
+                          ),
+                        );
+                        // context.go(
+                        //     '/register-organization/confirmation/confirmed');
+                      } else {
+                        context.go('/register-election/no-data');
+                      }
+                    } catch (e) {
+                      // Exception occurred during the request, handle the error here if needed
+                      context.go('/');
+                      print('Error: $e');
+                    }
                   }
                 },
                 style: ButtonStyle(
@@ -165,10 +187,7 @@ class JoinElectionConfirmation extends StatelessWidget {
     final electionData = jsonDecode(response.body);
 
     if (electionData != null) {
-      // Election storedElection = Election.fromJson(electionData);
       DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ssZ");
-
-      // print(electionData['title']);
 
       final elec = Election(
         title: electionData['title'],
@@ -280,27 +299,32 @@ class JoinOrganizationConfirmation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(const Duration(seconds: 5), () {
+      context.go('/');
+    });
     return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'You are joining the organization:',
-          textAlign: TextAlign.center,
+        Center(
+          child: CircularProgressIndicator(
+            color: Colors.blue,
+          ),
         ),
         SizedBox(
           height: 15,
         ),
         Text(
-          'Edinburgh University Students\' Union (EUSU)',
+          'Attempting to register you to the organization',
           textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
         ),
-        SizedBox(
-          height: 15,
-        ),
+        // Text(
+        //   'Edinburgh University Students\' Union (EUSU)',
+        //   textAlign: TextAlign.center,
+        //   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+        // ),
         Text(
-          'Are you sure?',
+          'Please wait...',
           textAlign: TextAlign.center,
         ),
       ],

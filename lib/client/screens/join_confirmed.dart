@@ -1,15 +1,9 @@
-import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_circular_progress.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
-import 'package:ecclesia_ui/services/secure_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 
 import '../../services/isar_services.dart';
 
@@ -108,48 +102,87 @@ class JoinOrganizationConfirmed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    Future.delayed(const Duration(seconds: 5), () {
+      context.go('/');
+    });
+    return const Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Icon(
-          Icons.check_circle,
-          size: 80,
-          color: Colors.green,
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          'Your current status on joining',
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 10),
-        // TODO: This is hard-coded
-        const Text(
-          'Edinburgh University Students\' Association (EUSA)',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
-          decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular(100.0),
+        Center(
+          child: CircularProgressIndicator(
+            color: Colors.blue,
           ),
-          child: const Text('Successful!',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-              )),
         ),
-        const SizedBox(height: 10),
-        const Text(
-          'You are now eligible to join election(s) by this organization.',
+        SizedBox(
+          height: 15,
+        ),
+        Text(
+          'Attempting to register you to the organization',
           textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Text(
+          'Please wait...',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
         ),
       ],
     );
   }
 }
+
+// class JoinOrganizationConfirmed extends StatelessWidget {
+//   const JoinOrganizationConfirmed({
+//     Key? key,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         const Icon(
+//           Icons.check_circle,
+//           size: 80,
+//           color: Colors.green,
+//         ),
+//         const SizedBox(height: 10),
+//         const Text(
+//           'Your current status on joining',
+//           textAlign: TextAlign.center,
+//         ),
+//         const SizedBox(height: 10),
+//         // TODO: This is hard-coded
+//         const Text(
+//           'Edinburgh University Students\' Association (EUSA)',
+//           textAlign: TextAlign.center,
+//           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+//         ),
+//         const SizedBox(height: 10),
+//         Container(
+//           padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
+//           decoration: BoxDecoration(
+//             color: Colors.green,
+//             borderRadius: BorderRadius.circular(100.0),
+//           ),
+//           child: const Text('Successful!',
+//               style: TextStyle(
+//                 fontSize: 12,
+//                 color: Colors.white,
+//               )),
+//         ),
+//         const SizedBox(height: 10),
+//         const Text(
+//           'You are now eligible to join election(s) by this organization.',
+//           textAlign: TextAlign.center,
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 // Custom widget to show message on confirmation of joining
 // an election
@@ -160,8 +193,6 @@ class JoinElectionPending extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     IsarService isarService = IsarService();
-// Election.fromJson(jsonDecode(electionJson));
-    // Election storedElection = isarService.getElectionById(id: invitationId);
     return FutureBuilder<Election?>(
         future: isarService.getElectionByInvitationId(invitationId),
         builder: (context, snapshot) {

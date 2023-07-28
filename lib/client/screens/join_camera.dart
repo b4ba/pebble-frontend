@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:convert';
 
+import 'join_confirmed.dart';
+
 // Screen to use camera to scan QR code to
 // either join an organization or an election.
 
@@ -100,8 +102,15 @@ class _JoinCameraState extends State<JoinCamera> {
 
                   // Proceed with registering with the organization
                   Future.delayed(const Duration(seconds: 3), () {
-                    // TODO: Implementation for joining organization <-- ADD HERE THE LOGIC FOR JOINING ORGANIZATION
-                    context.go('/register-organization/confirmation');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JoinConfirmed(
+                          isElection: false,
+                          invitationId: '',
+                        ),
+                      ),
+                    );
                   });
                 } else {
                   // Handle the case where the JSON does not contain either key

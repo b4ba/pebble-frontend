@@ -1,19 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:ecclesia_ui/client/screens/join_confirmation.dart';
+import 'package:ecclesia_ui/client/screens/join_confirmed.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
-import 'package:ecclesia_ui/data/models/election_model.dart';
-import 'package:ecclesia_ui/services/secure_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scan/scan.dart';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-
-import '../../data/models/choice_model.dart';
 
 // Screen that allow the user to join an organization/election by
 // inpuitting join code or using QR code.
@@ -113,8 +106,8 @@ class _JoinMethodState extends State<JoinMethod> {
                       children: [
                         Text(
                           widget.isElection
-                              ? 'Register to an election using a joining link:'
-                              : 'Register to an organization by:',
+                              ? 'Register to an election using a join link:'
+                              : 'Register to an organization using a join link:',
                           textAlign: TextAlign.center,
                         ),
                         Container(
@@ -148,11 +141,15 @@ class _JoinMethodState extends State<JoinMethod> {
                               context.go(
                                   '/register-election/confirmation/$inputCode');
                             } else {
-                              // TODO: This is hard-coded and should be change
-                              if (inputCode == 'edinburghuni432') {
-                                context
-                                    .go('/register-organization/confirmation');
-                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => JoinConfirmed(
+                                    isElection: false,
+                                    invitationId: inputCode,
+                                  ),
+                                ),
+                              );
                             }
                           },
                           child: const Text('Register'),
@@ -230,9 +227,24 @@ class _JoinMethodState extends State<JoinMethod> {
           // Extract the invitationID
           String invitationID = data['invitationID'];
           // Proceed with registering for an invitation
-          Future.delayed(const Duration(seconds: 3), () {
-            context.go('/register-election/confirmation/$invitationID');
-          });
+          if (widget.isElection) {
+            Future.delayed(const Duration(seconds: 3), () {
+              context.go('/register-election/confirmation/$invitationID');
+            });
+          } else {
+            Future.delayed(const Duration(seconds: 3), () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JoinConfirmed(
+                    isElection: false,
+                    invitationId: inputCode,
+                  ),
+                ),
+              );
+              // context.go('/register-organization/confirmed');
+            });
+          }
         }
       } else {
         print('InvitationID is null!');
