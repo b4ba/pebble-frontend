@@ -1,5 +1,6 @@
 import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
+import 'package:ecclesia_ui/data/models/organization_model.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -25,9 +26,19 @@ class IsarService {
     isar.writeTxnSync<int>(() => isar.choices.putSync(choice));
   }
 
+  Future<void> addOrganization(Organization organization) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.organizations.putSync(organization));
+  }
+
   Future<Election?> getElectionById(String id) async {
     final isar = await db;
     return await isar.elections.get(int.parse(id));
+  }
+
+  Future<Organization?> getOrganizationByIdentifier(String id) async {
+    final isar = await db;
+    return await isar.organizations.filter().identifierEqualTo(id).findFirst();
   }
 
   Future<List<Election>> getAllElections() async {
@@ -58,7 +69,7 @@ class IsarService {
     final dir = await getApplicationDocumentsDirectory();
     if (Isar.instanceNames.isEmpty) {
       return await Isar.open(
-        [ElectionSchema, ChoiceSchema],
+        [ElectionSchema, ChoiceSchema, OrganizationSchema],
         inspector: true,
         directory: dir.path,
       );

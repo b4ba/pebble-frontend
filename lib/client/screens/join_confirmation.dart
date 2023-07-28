@@ -79,7 +79,7 @@ class JoinConfirmation extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => JoinConfirmed(
                             isElection: true,
-                            invitationId: elec.invitationId,
+                            identifier: elec.invitationId,
                           ),
                         ),
                       );
@@ -94,32 +94,47 @@ class JoinConfirmation extends StatelessWidget {
                     final publicKey = await storage.read(key: 'publicKey');
                     final jsonData = jsonEncode({'pk': publicKey});
 
-                    try {
-                      final response = await http.post(
-                        Uri.parse(
-                            'http://localhost:8080/register-organization'),
-                        headers: {'Content-Type': 'application/json'},
-                        body: jsonData,
-                      );
-                      if (response.statusCode == 200) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => JoinConfirmed(
-                              isElection: false,
-                              invitationId: inputCode,
-                            ),
-                          ),
+                    final org = await isarService
+                        .getOrganizationByIdentifier(inputCode);
+                    if (org != null) {
+                      try {
+                        final response = await http.post(
+                          Uri.parse(org.url),
+                          headers: {'Content-Type': 'application/json'},
+                          body: jsonData,
                         );
-                        // context.go(
-                        //     '/register-organization/confirmation/confirmed');
-                      } else {
-                        context.go('/register-election/no-data');
+                        if (response.statusCode == 200) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => JoinConfirmed(
+                                isElection: false,
+                                identifier: inputCode,
+                              ),
+                            ),
+                          );
+                          context.go(
+                              '/register-organization/confirmation/confirmed');
+                        } else if (response.statusCode == 400) {
+                          if (response.body ==
+                              'Public key has already been added') {
+                            context.go('/joined-organization');
+                          } else {
+                            context.go('/register-election/no-data');
+                          }
+                        } else {
+                          print('ERROR JOINING ORGANIZATION');
+                          context.go('/register-election/no-data');
+                        }
+                      } catch (e) {
+                        // Exception occurred during the request, handle the error here if needed
+                        context.go('/');
+                        print('Error: $e');
                       }
-                    } catch (e) {
-                      // Exception occurred during the request, handle the error here if needed
+                    } else {
+                      print('Error joining organization: org not found in db');
                       context.go('/');
-                      print('Error: $e');
+                      return;
                     }
                   }
                 },
@@ -299,9 +314,6 @@ class JoinOrganizationConfirmation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 5), () {
-      context.go('/');
-    });
     return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,

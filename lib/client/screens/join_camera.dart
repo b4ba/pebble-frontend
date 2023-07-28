@@ -107,7 +107,7 @@ class _JoinCameraState extends State<JoinCamera> {
                       MaterialPageRoute(
                         builder: (context) => JoinConfirmed(
                           isElection: false,
-                          invitationId: '',
+                          identifier: '',
                         ),
                       ),
                     );

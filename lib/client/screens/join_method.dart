@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:ecclesia_ui/client/screens/join_confirmed.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
+import 'package:ecclesia_ui/data/models/organization_model.dart';
+import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -107,65 +109,73 @@ class _JoinMethodState extends State<JoinMethod> {
                         Text(
                           widget.isElection
                               ? 'Register to an election using a join link:'
-                              : 'Register to an organization using a join link:',
+                              : 'Register to an organization:',
                           textAlign: TextAlign.center,
                         ),
-                        Container(
-                          height: 60,
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          // Text field to join using join code
-                          child: TextField(
-                              onChanged: ((value) {
-                                setState(() {
-                                  inputCode = value;
-                                });
-                              }),
-                              decoration: const InputDecoration(
-                                // labelText: 'Input joining link here',
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(6)),
-                                  borderSide:
-                                      BorderSide(width: 0, color: Colors.white),
-                                ),
-                                fillColor: Color.fromARGB(255, 217, 217, 217),
-                                filled: true,
-                                labelStyle:
-                                    TextStyle(color: Colors.grey, fontSize: 14),
-                              )),
-                        ),
+                        widget.isElection
+                            ? Container(
+                                height: 60,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                // Text field to join using join code
+                                child: TextField(
+                                    onChanged: ((value) {
+                                      setState(() {
+                                        inputCode = value;
+                                      });
+                                    }),
+                                    decoration: const InputDecoration(
+                                      // labelText: 'Input joining link here',
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(6)),
+                                        borderSide: BorderSide(
+                                            width: 0, color: Colors.white),
+                                      ),
+                                      fillColor:
+                                          Color.fromARGB(255, 217, 217, 217),
+                                      filled: true,
+                                      labelStyle: TextStyle(
+                                          color: Colors.grey, fontSize: 14),
+                                    )),
+                              )
+                            : const Text(''),
                         // Button to submit join code
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (widget.isElection) {
-                              context.go(
-                                  '/register-election/confirmation/$inputCode');
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => JoinConfirmed(
-                                    isElection: false,
-                                    invitationId: inputCode,
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                          child: const Text('Register'),
-                        ),
+                        widget.isElection
+                            ? ElevatedButton(
+                                onPressed: () async {
+                                  // if (widget.isElection) {
+                                  context.go(
+                                      '/register-election/confirmation/$inputCode');
+                                  // } else {
+                                  //   Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //       builder: (context) => JoinConfirmed(
+                                  //         isElection: false,
+                                  //         invitationId: inputCode,
+                                  //       ),
+                                  //     ),
+                                  //   );
+                                  // }
+                                },
+                                child: const Text('Register'),
+                              )
+                            : const Text('')
                       ],
                     ),
-                    const SizedBox(
-                      height: 70,
-                      child: Center(
-                        child: Text(
-                          'OR',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
+                    widget.isElection
+                        ? const SizedBox(
+                            height: 70,
+                            child: Center(
+                              child: Text(
+                                'OR',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )
+                        : const Text(''),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -215,39 +225,48 @@ class _JoinMethodState extends State<JoinMethod> {
   Future<void> scanQRFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       final qrText = await Scan.parse(pickedFile.path);
-      final inputCode =
-          qrText; // Extract the invitationID from the QR code text
-      if (inputCode != null) {
-        final data = jsonDecode(inputCode);
+      // Extract the invitationID from the QR code text)
+      if (qrText != null) {
         // Check if the JSON contains an 'invitationID' key
-        if (data.containsKey('invitationID')) {
-          // Extract the invitationID
-          String invitationID = data['invitationID'];
-          // Proceed with registering for an invitation
-          if (widget.isElection) {
+        if (widget.isElection) {
+          final data = jsonDecode(qrText);
+          if (data.containsKey('invitationID')) {
+            // Extract the invitationID
+            String invitationID = data['invitationID'];
+            // Proceed with registering for an invitation
             Future.delayed(const Duration(seconds: 3), () {
               context.go('/register-election/confirmation/$invitationID');
             });
-          } else {
             Future.delayed(const Duration(seconds: 3), () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => JoinConfirmed(
                     isElection: false,
-                    invitationId: inputCode,
+                    identifier: inputCode,
                   ),
                 ),
               );
               // context.go('/register-organization/confirmed');
             });
+          } else {
+            context.go('/register-election/no-data');
           }
+        } else {
+          // org time
+          final organization = Organization.fromJson(qrText);
+          IsarService().addOrganization(organization);
+          // Proceed with registering for an invitation
+          // Future.delayed(const Duration(seconds: 3), () {
+          print('very nice');
+          context.go(
+              '/register-organization/confirmation/${organization.identifier}');
+          // });
         }
       } else {
-        print('InvitationID is null!');
+        print('QR is null!');
       }
     }
   }

@@ -116,7 +116,7 @@ GoRouter appRouter = GoRouter(
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: false,
-                        invitationId: state.params['invitationId']!,
+                        identifier: state.params['invitationId']!,
                       );
                     },
                   ),
@@ -148,7 +148,7 @@ GoRouter appRouter = GoRouter(
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: true,
-                        invitationId: state.params['invitationId']!,
+                        identifier: state.params['invitationId']!,
                       );
                     },
                   ),

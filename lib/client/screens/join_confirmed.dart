@@ -2,6 +2,7 @@ import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_circular_progress.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
+import 'package:ecclesia_ui/data/models/organization_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,9 +14,9 @@ import '../../services/isar_services.dart';
 
 class JoinConfirmed extends StatefulWidget {
   final bool isElection;
-  final String invitationId;
+  final String identifier;
   const JoinConfirmed(
-      {Key? key, required this.isElection, required this.invitationId})
+      {Key? key, required this.isElection, required this.identifier})
       : super(key: key);
 
   @override
@@ -85,8 +86,9 @@ class _JoinConfirmedState extends State<JoinConfirmed> {
                           offset: const Offset(0, 6)),
                     ]),
                 child: widget.isElection
-                    ? JoinElectionPending(invitationId: widget.invitationId)
-                    : const JoinOrganizationConfirmed(),
+                    ? JoinElectionPending(invitationId: widget.identifier)
+                    : JoinOrganizationConfirmed(
+                        organizationIdentifier: widget.identifier),
               ),
       ),
     );
@@ -96,99 +98,83 @@ class _JoinConfirmedState extends State<JoinConfirmed> {
 // Custom widget to show message on confirmation of joining
 // an organization
 class JoinOrganizationConfirmed extends StatelessWidget {
+  final String organizationIdentifier;
+
   const JoinOrganizationConfirmed({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+    required this.organizationIdentifier,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 5), () {
-      context.go('/');
-    });
-    return const Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Center(
-          child: CircularProgressIndicator(
-            color: Colors.blue,
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Text(
-          'Attempting to register you to the organization',
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Text(
-          'Please wait...',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-        ),
-      ],
-    );
+    IsarService isarService = IsarService();
+    return FutureBuilder<Organization?>(
+        future: isarService.getOrganizationByIdentifier(organizationIdentifier),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return const Text('Error fetching data');
+          } else {
+            final org = snapshot.data;
+            if (org != null) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.check_circle,
+                    size: 80,
+                    color: Colors.green,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Your current status on joining',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    org.name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 20),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 3.0, horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(100.0),
+                    ),
+                    child: const Text('Successful!',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        )),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'You are now eligible to join election(s) by this organization.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              );
+            } else {
+              return const Column(children: [
+                Text('Error retrieving joined organization data'),
+                Text('Sorry'),
+              ]);
+            }
+          }
+        });
   }
 }
-
-// class JoinOrganizationConfirmed extends StatelessWidget {
-//   const JoinOrganizationConfirmed({
-//     Key? key,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         const Icon(
-//           Icons.check_circle,
-//           size: 80,
-//           color: Colors.green,
-//         ),
-//         const SizedBox(height: 10),
-//         const Text(
-//           'Your current status on joining',
-//           textAlign: TextAlign.center,
-//         ),
-//         const SizedBox(height: 10),
-//         // TODO: This is hard-coded
-//         const Text(
-//           'Edinburgh University Students\' Association (EUSA)',
-//           textAlign: TextAlign.center,
-//           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-//         ),
-//         const SizedBox(height: 10),
-//         Container(
-//           padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 10.0),
-//           decoration: BoxDecoration(
-//             color: Colors.green,
-//             borderRadius: BorderRadius.circular(100.0),
-//           ),
-//           child: const Text('Successful!',
-//               style: TextStyle(
-//                 fontSize: 12,
-//                 color: Colors.white,
-//               )),
-//         ),
-//         const SizedBox(height: 10),
-//         const Text(
-//           'You are now eligible to join election(s) by this organization.',
-//           textAlign: TextAlign.center,
-//         ),
-//       ],
-//     );
-//   }
-// }
 
 // Custom widget to show message on confirmation of joining
 // an election
 class JoinElectionPending extends StatelessWidget {
   final String invitationId;
-  JoinElectionPending({super.key, required this.invitationId});
+  const JoinElectionPending({super.key, required this.invitationId});
 
   @override
   Widget build(BuildContext context) {
@@ -257,6 +243,19 @@ class JoinElectionPending extends StatelessWidget {
         });
   }
 }
+
+// const storage = FlutterSecureStorage();
+// final publicKey = await storage.read(key: 'publicKey');
+// final jsonData = jsonEncode({'pk': publicKey});
+
+// try {
+//   final response = await http.post(
+//     Uri.parse(
+//         'http://localhost:8080/register-organization'),
+//     headers: {'Content-Type': 'application/json'},
+//     body: jsonData,
+//   );
+//   if (response.statusCode == 200) {
 
 class NoDataWidget extends StatelessWidget {
   const NoDataWidget({super.key});
