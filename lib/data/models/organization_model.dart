@@ -9,6 +9,7 @@ part 'organization_model.g.dart';
 @Collection(inheritance: false)
 class Organization {
   final Id id = Isar.autoIncrement;
+  @Index(unique: true)
   final String identifier;
   final String name;
   final String description;

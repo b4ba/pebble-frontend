@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:isar/isar.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:convert';
 
@@ -102,7 +103,15 @@ class _JoinCameraState extends State<JoinCamera> {
                   // Check if the JSON contains an 'organizationID' key
                 } else if (data.containsKey('url')) {
                   final organization = Organization.fromJson(code);
-                  IsarService().addOrganization(organization);
+                  try {
+                    IsarService().addOrganization(organization);
+                  } catch (e) {
+                    if ((e is IsarError) &&
+                        e.message.contains('unique constraint violated')) {
+                      context.go('/joined-organization');
+                    }
+                    context.go('/joined-organization');
+                  }
                   BlocProvider.value(
                       value: BlocProvider.of<LoggedUserBloc>(context)
                         ..add(LoadJoinedOrganizationsEvent(

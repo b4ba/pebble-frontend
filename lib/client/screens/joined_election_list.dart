@@ -46,11 +46,12 @@ class JoinedElectionList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5.0),
-                  child: Text(
+                  padding: EdgeInsets.symmetric(vertical: 9.0),
+                  child: Center(
+                      child: Text(
                     'Ended elections:',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
+                  )),
                 ),
                 // SearchBar(),
                 BlocBuilder<ElectionJustEndedBloc, ElectionJustEndedState>(
@@ -81,42 +82,68 @@ class JoinedElectionList extends StatelessWidget {
                                               election.endTime) ==
                                           ElectionStatusEnum.voteClosed)
                                       .toList();
-                                  return Expanded(
-                                      child: ListView.builder(
-                                          itemCount: justEndedElections.length,
-                                          itemBuilder: (context, index) {
-                                            return ElectionCard(
-                                              electionDescription:
-                                                  justEndedElections[index]
-                                                      .description,
-                                              electionOrganization:
-                                                  justEndedElections[index]
-                                                      .organization,
-                                              electionTitle:
-                                                  justEndedElections[index]
-                                                      .title,
-                                              id: justEndedElections[index]
-                                                  .invitationId,
-                                              status: getElectionStatus(
-                                                  justEndedElections[index]
-                                                      .startTime,
-                                                  justEndedElections[index]
-                                                      .endTime),
-                                              userId: '1',
-                                            );
-                                          }));
+                                  if (justEndedElections.isEmpty) {
+                                    return const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 14.0),
+                                        child: Center(
+                                            child: Text(
+                                          'You haven\'t joined any expired elections',
+                                        )));
+                                  } else {
+                                    return Expanded(
+                                        child: ListView.builder(
+                                            itemCount:
+                                                justEndedElections.length,
+                                            itemBuilder: (context, index) {
+                                              return ElectionCard(
+                                                electionDescription:
+                                                    justEndedElections[index]
+                                                        .description,
+                                                electionOrganization:
+                                                    justEndedElections[index]
+                                                        .organization,
+                                                electionTitle:
+                                                    justEndedElections[index]
+                                                        .title,
+                                                id: justEndedElections[index]
+                                                    .invitationId,
+                                                status: getElectionStatus(
+                                                    justEndedElections[index]
+                                                        .startTime,
+                                                    justEndedElections[index]
+                                                        .endTime),
+                                                userId: '1',
+                                              );
+                                            }));
+                                  }
                                 } else {
-                                  return const Text(
-                                      'No just ended elections a1');
+                                  return const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 14.0),
+                                      child: Center(
+                                          child: Text(
+                                        'You haven\'t joined any expired elections',
+                                      )));
                                 }
                               } else {
                                 // If there are no just ended elections, display a message
-                                return const Text('No just ended elections a2');
+                                return const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 14.0),
+                                    child: Center(
+                                        child: Text(
+                                      'You haven\'t joined any expired elections',
+                                    )));
                               }
                             }
                           });
                     } else {
-                      return const Text('Something is wrong a');
+                      return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 14.0),
+                          child: Center(
+                              child: Text(
+                                  'Something went wrong fetching your expired election data')));
                     }
                   },
                 ),
@@ -149,78 +176,71 @@ class JoinedElectionList extends StatelessWidget {
                                 final elections = snapshot.data;
                                 if (elections != null) {
                                   if (elections.isNotEmpty) {
-                                    final justEndedElections = elections
+                                    final activeElections = elections
                                         .where((election) =>
                                             getElectionStatus(
                                                 election.startTime,
                                                 election.endTime) !=
                                             ElectionStatusEnum.voteClosed)
                                         .toList();
-                                    return Expanded(
-                                        child: ListView.builder(
-                                            itemCount:
-                                                justEndedElections.length,
-                                            itemBuilder: (context, index) {
-                                              return ElectionCard(
-                                                electionDescription:
-                                                    justEndedElections[index]
-                                                        .description,
-                                                electionOrganization:
-                                                    justEndedElections[index]
-                                                        .organization,
-                                                electionTitle:
-                                                    justEndedElections[index]
-                                                        .title,
-                                                id: justEndedElections[index]
-                                                    .invitationId,
-                                                status: getElectionStatus(
-                                                    justEndedElections[index]
-                                                        .startTime,
-                                                    justEndedElections[index]
-                                                        .endTime),
-                                                userId: '1',
-                                              );
-                                            }));
-                                    // return Expanded(
-                                    //     child: ListView.builder(
-                                    //         padding: const EdgeInsets.only(
-                                    //             bottom: 100),
-                                    //         itemCount: state.elections.length,
-                                    //         itemBuilder: (_, index) {
-                                    //           Election key = state
-                                    //               .elections.keys
-                                    //               .elementAt(index);
-
-                                    //           if (state.elections[key] ==
-                                    //               ElectionStatusEnum
-                                    //                   .voteClosed) {
-                                    //             return Container();
-                                    //           }
-
-                                    //           return ElectionCard(
-                                    //             id: key.invitationId,
-                                    //             electionTitle: key.title,
-                                    //             electionDescription:
-                                    //                 key.description,
-                                    //             electionOrganization:
-                                    //                 key.organization,
-                                    //             status: state.elections[key]!,
-                                    //             userId: user.id,
-                                    //           );
-                                    //         }));
+                                    if (activeElections.isEmpty) {
+                                      return const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 14.0),
+                                          child: Center(
+                                              child: Text(
+                                                  'You haven\'t joined any elections yet')));
+                                    } else {
+                                      return Expanded(
+                                          child: ListView.builder(
+                                              itemCount: activeElections.length,
+                                              itemBuilder: (context, index) {
+                                                return ElectionCard(
+                                                  electionDescription:
+                                                      activeElections[index]
+                                                          .description,
+                                                  electionOrganization:
+                                                      activeElections[index]
+                                                          .organization,
+                                                  electionTitle:
+                                                      activeElections[index]
+                                                          .title,
+                                                  id: activeElections[index]
+                                                      .invitationId,
+                                                  status: getElectionStatus(
+                                                      activeElections[index]
+                                                          .startTime,
+                                                      activeElections[index]
+                                                          .endTime),
+                                                  userId: '1',
+                                                );
+                                              }));
+                                    }
                                   } else {
-                                    return const Text(
-                                        'No just ended elections b1');
+                                    return const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 14.0),
+                                        child: Center(
+                                            child: Text(
+                                                'You haven\'t joined any elections yet')));
                                   }
                                 } else {
                                   // If there are no just ended elections, display a message
-                                  return const Text(
-                                      'No just ended elections b2');
+                                  return const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 14.0),
+                                      child: Center(
+                                          child: Text(
+                                              'You haven\'t joined any elections yet')));
                                 }
                               }
                             });
                       } else {
-                        return const Text('Something is wrong b');
+                        return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14.0),
+                            child: Center(
+                                child: Text(
+                                    'Something went wrong fetching your active election data')));
                       }
                     })
                   ]),

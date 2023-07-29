@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:ecclesia_ui/client/screens/join_confirmed.dart';
+import 'package:ecclesia_ui/client/screens/joined_organization_list.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/organization_model.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:isar/isar.dart';
 import 'package:scan/scan.dart';
 
 // Screen that allow the user to join an organization/election by
@@ -257,7 +259,14 @@ class _JoinMethodState extends State<JoinMethod> {
         } else {
           // org time
           final organization = Organization.fromJson(qrText);
-          IsarService().addOrganization(organization);
+          try {
+            IsarService().addOrganization(organization);
+          } catch (e) {
+            if ((e is IsarError) &&
+                e.message.contains('unique constraint violated')) {
+              context.go('/joined-organization');
+            }
+          }
           BlocProvider.value(
               value: BlocProvider.of<LoggedUserBloc>(context)
                 ..add(
@@ -274,3 +283,36 @@ class _JoinMethodState extends State<JoinMethod> {
     }
   }
 }
+
+// class DialogAlreadyJoined extends StatelessWidget {
+//   const DialogAlreadyJoined({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextButton(
+//       onPressed: () => showDialog<String>(
+//         context: context,
+//         builder: (BuildContext context) => AlertDialog(
+//           title: const Text('Error Joining Organization'),
+//           content: const Text(
+//               'You have already been registered to the organisation you are trying to join. Would you like to view joined organisations?'),
+//           actions: <Widget>[
+//             TextButton(
+//               onPressed: () => Navigator.pop(context, 'Cancel'),
+//               child: const Text('Cancel'),
+//             ),
+//             TextButton(
+//               onPressed: () => Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                     builder: (context) => JoinedOrganizationList()),
+//               ),
+//               child: const Text('OK'),
+//             ),
+//           ],
+//         ),
+//       ),
+//       child: const Text('Show Dialog'),
+//     );
+//   }
+// }
