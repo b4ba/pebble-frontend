@@ -41,6 +41,11 @@ class IsarService {
     return await isar.elections.where().findAll();
   }
 
+  Future<void> deleteOrganization(String identifier) async {
+    final isar = await db;
+    isar.writeTxn(() => isar.organizations.deleteByIdentifier(identifier));
+  }
+
   Future<List<Organization>> getAllOrganizations() async {
     final isar = await db;
     return await isar.organizations.where().findAll();

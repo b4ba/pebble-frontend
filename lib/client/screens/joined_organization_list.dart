@@ -44,7 +44,7 @@ class _JoinedOrganizationListState extends State<JoinedOrganizationList> {
             future: organizations,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Show loading indicator
+                return const CircularProgressIndicator(); // Show loading indicator
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}'); // Handle error
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

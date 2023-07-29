@@ -150,6 +150,7 @@ class JoinConfirmation extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
+                  IsarService().deleteOrganization(inputCode);
                   context.pop();
                 },
                 style: ButtonStyle(
@@ -322,7 +323,6 @@ class JoinOrganizationConfirmation extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
-            print(snapshot.error);
             return const Text('Error fetching data');
           } else {
             if (snapshot.data != null) {
@@ -346,7 +346,8 @@ class JoinOrganizationConfirmation extends StatelessWidget {
                   Text(
                     election!.name,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 25),
                   ),
                   const Text(
                     'Are you sure?',
