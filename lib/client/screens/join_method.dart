@@ -4,8 +4,10 @@ import 'package:ecclesia_ui/client/screens/join_confirmed.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/organization_model.dart';
+import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scan/scan.dart';
@@ -239,28 +241,29 @@ class _JoinMethodState extends State<JoinMethod> {
             Future.delayed(const Duration(seconds: 3), () {
               context.go('/register-election/confirmation/$invitationID');
             });
-            Future.delayed(const Duration(seconds: 3), () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => JoinConfirmed(
-                    isElection: false,
-                    identifier: inputCode,
-                  ),
-                ),
-              );
-              // context.go('/register-organization/confirmed');
-            });
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => JoinConfirmed(
+            //       isElection: false,
+            //       identifier: inputCode,
+            //     ),
+            //   ),
+            // );
+            // context.go('/register-organization/confirmed');
           } else {
-            context.go('/register-election/no-data');
+            context.go('/no-data');
           }
         } else {
           // org time
           final organization = Organization.fromJson(qrText);
           IsarService().addOrganization(organization);
+          BlocProvider.value(
+              value: BlocProvider.of<LoggedUserBloc>(context)
+                ..add(
+                    LoadJoinedOrganizationsEvent(organization: organization)));
           // Proceed with registering for an invitation
           // Future.delayed(const Duration(seconds: 3), () {
-          print('very nice');
           context.go(
               '/register-organization/confirmation/${organization.identifier}');
           // });

@@ -24,7 +24,13 @@ class JoinElectionLoggedUserEvent extends LoggedUserEvent {
 }
 
 class JoinOrganizationLoggedUserEvent extends LoggedUserEvent {
-  final String organizationId;
+  final String organizationIdentifier;
 
-  const JoinOrganizationLoggedUserEvent({required this.organizationId});
+  const JoinOrganizationLoggedUserEvent({required this.organizationIdentifier});
+}
+
+class LoadJoinedOrganizationsEvent extends LoggedUserEvent {
+  final Organization organization;
+
+  const LoadJoinedOrganizationsEvent({required this.organization});
 }

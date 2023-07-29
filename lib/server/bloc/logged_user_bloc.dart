@@ -4,6 +4,8 @@ import 'package:ecclesia_ui/data/models/organization_model.dart';
 import 'package:ecclesia_ui/data/models/voter_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../services/isar_services.dart';
+
 part 'logged_user_event.dart';
 part 'logged_user_state.dart';
 
@@ -47,9 +49,19 @@ class LoggedUserBloc extends Bloc<LoggedUserEvent, LoggedUserState> {
     on<JoinOrganizationLoggedUserEvent>((event, emit) {
       if (state is LoggedUserLoaded) {
         final state = this.state as LoggedUserLoaded;
-        state.user.joinedOrganizations[event.organizationId] =
-            Organization.organizations[int.parse(event.organizationId)];
+        state.user.joinedOrganizations[event.organizationIdentifier] =
+            Organization.organizations[int.parse(event.organizationIdentifier)];
         emit(LoggedUserLoaded(user: state.user));
+      }
+    });
+    on<LoadJoinedOrganizationsEvent>((event, emit) async {
+      final isarService = IsarService();
+      final organizations = await isarService.getAllOrganizations();
+      if (organizations != null) {
+        emit(OrganizationsLoaded(organizations: organizations));
+      } else {
+        // Handle the case when the organizations are no found in the Isar database.
+        print('organizations could not be loaded');
       }
     });
   }

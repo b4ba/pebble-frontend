@@ -5,6 +5,7 @@ import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
+import 'package:ecclesia_ui/data/models/organization_model.dart';
 import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
@@ -103,28 +104,29 @@ class JoinConfirmation extends StatelessWidget {
                           headers: {'Content-Type': 'application/json'},
                           body: jsonData,
                         );
+                        print(response.body);
                         if (response.statusCode == 200) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => JoinConfirmed(
                                 isElection: false,
-                                identifier: inputCode,
+                                identifier: org.identifier,
                               ),
                             ),
                           );
-                          context.go(
-                              '/register-organization/confirmation/confirmed');
+                          // context.go(
+                          //     '/register-organization/confirmation/confirmed');
                         } else if (response.statusCode == 400) {
                           if (response.body ==
                               'Public key has already been added') {
                             context.go('/joined-organization');
                           } else {
-                            context.go('/register-election/no-data');
+                            context.go('/no-data');
                           }
                         } else {
                           print('ERROR JOINING ORGANIZATION');
-                          context.go('/register-election/no-data');
+                          context.go('/no-data');
                         }
                       } catch (e) {
                         // Exception occurred during the request, handle the error here if needed
@@ -181,7 +183,7 @@ class JoinConfirmation extends StatelessWidget {
                 ? JoinElectionConfirmation(
                     inputCode: inputCode,
                   )
-                : const JoinOrganizationConfirmation(),
+                : JoinOrganizationConfirmation(id: inputCode),
           ),
         ),
       ),
@@ -308,38 +310,54 @@ class NoDataWidget extends StatelessWidget {
 // Prompt message to confirm from the user of intended organization
 // to join
 class JoinOrganizationConfirmation extends StatelessWidget {
-  const JoinOrganizationConfirmation({
-    Key? key,
-  }) : super(key: key);
+  final String id;
+
+  const JoinOrganizationConfirmation({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Center(
-          child: CircularProgressIndicator(
-            color: Colors.blue,
-          ),
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        Text(
-          'Attempting to register you to the organization',
-          textAlign: TextAlign.center,
-        ),
-        // Text(
-        //   'Edinburgh University Students\' Union (EUSU)',
-        //   textAlign: TextAlign.center,
-        //   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
-        // ),
-        Text(
-          'Please wait...',
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
+    return FutureBuilder<Organization?>(
+        future: IsarService().getOrganizationByIdentifier(id),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            print(snapshot.error);
+            return const Text('Error fetching data');
+          } else {
+            if (snapshot.data != null) {
+              final election = snapshot.data;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const Text(
+                    'Attempting to register you to the organization',
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    election!.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+                  ),
+                  const Text(
+                    'Are you sure?',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              );
+            } else {
+              return const NoDataWidget();
+            }
+          }
+        });
   }
 }

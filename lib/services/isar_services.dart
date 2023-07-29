@@ -31,11 +31,6 @@ class IsarService {
     isar.writeTxnSync<int>(() => isar.organizations.putSync(organization));
   }
 
-  Future<Election?> getElectionById(String id) async {
-    final isar = await db;
-    return await isar.elections.get(int.parse(id));
-  }
-
   Future<Organization?> getOrganizationByIdentifier(String id) async {
     final isar = await db;
     return await isar.organizations.filter().identifierEqualTo(id).findFirst();
@@ -44,6 +39,11 @@ class IsarService {
   Future<List<Election>> getAllElections() async {
     final isar = await db;
     return await isar.elections.where().findAll();
+  }
+
+  Future<List<Organization>> getAllOrganizations() async {
+    final isar = await db;
+    return await isar.organizations.where().findAll();
   }
 
   Stream<List<Election>> listenToElections() async* {

@@ -14,7 +14,8 @@ class JoinedOrganizationList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 246, 248, 250),
-      appBar: const CustomAppBar(back: true, disableBackGuard: true, disableMenu: false),
+      appBar: const CustomAppBar(
+          back: true, disableBackGuard: true, disableMenu: false),
       endDrawer: const CustomDrawer(),
       body: Column(children: [
         const Padding(
@@ -30,12 +31,16 @@ class JoinedOrganizationList extends StatelessWidget {
             builder: (context, state) {
               if (state is LoggedUserInitial) {
                 return const CircularProgressIndicator();
-              } else if (state is LoggedUserLoaded) {
+              } else if (state is OrganizationsLoaded) {
                 return ListView.builder(
-                  itemCount: state.user.joinedOrganizations.length,
+                  itemCount: state.organizations.length,
                   itemBuilder: ((context, index) {
-                    Organization organization = state.user.joinedOrganizations.entries.elementAt(index).value;
-                    return OrganizationCard(icon: organization.icon, title: organization.name, description: organization.description);
+                    Organization organization =
+                        state.organizations.elementAt(index);
+                    return OrganizationCard(
+                        icon: Icons.business,
+                        title: organization.name,
+                        description: organization.description);
                   }),
                 );
               } else {
@@ -71,7 +76,8 @@ class OrganizationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
         boxShadow: [
           BoxShadow(
-              color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.14), //color of shadow
+              color: const Color.fromARGB(255, 0, 0, 0)
+                  .withOpacity(0.14), //color of shadow
               spreadRadius: 0, //spread radius
               blurRadius: 10, // blur radius
               offset: const Offset(0, 4)),

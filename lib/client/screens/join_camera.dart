@@ -1,6 +1,10 @@
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
+import 'package:ecclesia_ui/data/models/organization_model.dart';
+import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
+import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -96,22 +100,27 @@ class _JoinCameraState extends State<JoinCamera> {
                   });
 
                   // Check if the JSON contains an 'organizationID' key
-                } else if (data.containsKey('organizationID')) {
-                  // Extract the organizationID
-                  String organizationID = data['organizationID'];
+                } else if (data.containsKey('url')) {
+                  final organization = Organization.fromJson(code);
+                  IsarService().addOrganization(organization);
+                  BlocProvider.value(
+                      value: BlocProvider.of<LoggedUserBloc>(context)
+                        ..add(LoadJoinedOrganizationsEvent(
+                            organization: organization)));
+                  // Proceed with registering for an invitation
+                  context.go(
+                      '/register-organization/confirmation/${organization.identifier}');
 
-                  // Proceed with registering with the organization
-                  Future.delayed(const Duration(seconds: 3), () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => JoinConfirmed(
-                          isElection: false,
-                          identifier: '',
-                        ),
-                      ),
-                    );
-                  });
+                  // // Proceed with registering with the organization
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => JoinConfirmed(
+                  //         isElection: false,
+                  //         identifier: organization.id,
+                  //       ),
+                  //     )
+                  //   );
                 } else {
                   // Handle the case where the JSON does not contain either key
                   Future.delayed(const Duration(seconds: 3), () {

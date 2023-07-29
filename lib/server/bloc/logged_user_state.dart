@@ -11,3 +11,9 @@ class LoggedUserLoaded extends LoggedUserState {
 
   const LoggedUserLoaded({required this.user});
 }
+
+class OrganizationsLoaded extends LoggedUserState {
+  final List<Organization> organizations;
+
+  const OrganizationsLoaded({required this.organizations});
+}

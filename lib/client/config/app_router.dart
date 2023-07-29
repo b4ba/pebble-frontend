@@ -154,11 +154,6 @@ GoRouter appRouter = GoRouter(
                   ),
                 ]),
             GoRoute(
-              path: 'no-data',
-              builder: (context, state) =>
-                  const join_confirmation.NoDataWidget(),
-            ),
-            GoRoute(
               path: 'camera',
               builder: (BuildContext context, GoRouterState state) {
                 return const JoinCamera(
@@ -167,6 +162,10 @@ GoRouter appRouter = GoRouter(
               },
             ),
           ],
+        ),
+        GoRoute(
+          path: 'no-data',
+          builder: (context, state) => const join_confirmation.NoDataWidget(),
         ),
         // View joined organizations
         GoRoute(
