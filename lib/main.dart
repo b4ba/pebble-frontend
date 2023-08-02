@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'E-cclesia UI',
+      title: 'Pebble Voting',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Poppins',
