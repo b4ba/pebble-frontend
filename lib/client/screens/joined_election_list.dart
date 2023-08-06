@@ -10,8 +10,8 @@ import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-// This screen is the home screen or can be known as 'Joined election list'
-// screen which is meant to list current active joined election(s).
+// The 'Joined election list' screen functions as the app's home screen
+// It lists the user's currently active and expired joined elections.
 
 class JoinedElectionList extends StatelessWidget {
   final Voter user;
@@ -23,7 +23,8 @@ class JoinedElectionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IsarService store = IsarService();
+    IsarService isarService = IsarService();
+
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(
@@ -54,6 +55,9 @@ class JoinedElectionList extends StatelessWidget {
                   )),
                 ),
                 // SearchBar(),
+
+                // FutureBu
+
                 BlocBuilder<ElectionJustEndedBloc, ElectionJustEndedState>(
                   builder: (context, state) {
                     if (state is ElectionJustEndedInitial) {
@@ -65,13 +69,14 @@ class JoinedElectionList extends StatelessWidget {
                     } else if (state is ElectionJustEndedLoaded) {
                       // Filter elections based on the status
                       return FutureBuilder(
-                          future: store.getAllElections(),
+                          future: isarService.getAllElections(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
-                              return const Text('Error fetching data');
+                              return const Text(
+                                  'Error fetching election data from database');
                             } else {
                               final elections = snapshot.data;
                               if (elections != null) {
@@ -165,7 +170,7 @@ class JoinedElectionList extends StatelessWidget {
                         );
                       } else if (state is JoinedElectionsLoaded) {
                         return FutureBuilder(
-                            future: store.getAllElections(),
+                            future: isarService.getAllElections(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -283,39 +288,3 @@ class SearchBar extends StatelessWidget {
     );
   }
 }
-
-      // Container(
-                //   margin: const EdgeInsets.symmetric(vertical: 10.0),
-                //   child: Column(children: [
-                //     const Padding(
-                //       padding: EdgeInsets.symmetric(vertical: 5.0),
-                //       child: Text(
-                //         'Just ended:',
-                //         textAlign: TextAlign.center,
-                //         style: TextStyle(
-                //             fontSize: 16, fontWeight: FontWeight.w700),
-                //       ),
-                //     ),
-                //     BlocBuilder<ElectionJustEndedBloc, ElectionJustEndedState>(
-                //       builder: (context, state) {
-                //         if (state is ElectionJustEndedInitial) {
-                //           return const Center(
-                //             child: CircularProgressIndicator(
-                //               color: Colors.blue,
-                //             ),
-                //           );
-                //         } else if (state is ElectionJustEndedLoaded) {
-                //           return ElectionCard(
-                //               id: state.election.id.toString(),
-                //               electionTitle: state.election.title,
-                //               electionDescription: state.election.description,
-                //               electionOrganization: state.election.organization,
-                //               status: state.status,
-                //               userId: user.id);
-                //         } else {
-                //           return const Text('Something is wrong');
-                //         }
-                //       },
-                //     ),
-                //   ]),
-                // ),

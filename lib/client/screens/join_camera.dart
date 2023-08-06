@@ -119,17 +119,6 @@ class _JoinCameraState extends State<JoinCamera> {
                   // Proceed with registering for an invitation
                   context.go(
                       '/register-organization/confirmation/${organization.identifier}');
-
-                  // // Proceed with registering with the organization
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => JoinConfirmed(
-                  //         isElection: false,
-                  //         identifier: organization.id,
-                  //       ),
-                  //     )
-                  //   );
                 } else {
                   // Handle the case where the JSON does not contain either key
                   Future.delayed(const Duration(seconds: 3), () {

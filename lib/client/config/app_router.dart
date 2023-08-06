@@ -17,8 +17,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ecclesia_ui/client/screens/join_confirmation.dart'
     as join_confirmation;
-// import 'package:ecclesia_ui/client/screens/join_confirmed.dart'
-// as joinConfirmed;
 
 GoRouter appRouter = GoRouter(
   routes: <GoRoute>[
@@ -32,7 +30,6 @@ GoRouter appRouter = GoRouter(
           builder: (context, state) {
             if (state is LoggedUserLoaded) {
               return JoinedElectionList(user: state.user);
-              // return const Welcome();
             } else {
               return const Welcome();
             }
@@ -40,31 +37,27 @@ GoRouter appRouter = GoRouter(
         ),
       ),
       routes: <GoRoute>[
-        // Past Elections
+        // View of expired elections, such that the home page is less cluttered
+        // Currently, all expired elections fall under the "Just expired" tab
         GoRoute(
           path: 'past-elections',
           builder: (context, state) => const PastElections(),
-          // pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(context: context, state: state, child: const PastElections()),
-          // builder: (BuildContext context, GoRouterState state) {
-          //   return const PastElections();
-          // },
         ),
-        // Election Detail
+        // Detailed view of an election
         GoRoute(
-          path: 'election-detail/:invitationId/:userId',
+          path: 'election-detail/:electionId/:userId',
           builder: (BuildContext context, GoRouterState state) {
             return ElectionDashboard(
-                invitationId: state.params['invitationId']!,
+                electionId: state.params['electionId']!,
                 userId: state.params['userId']!);
           },
-          // pageBuilder: (context, state) => buildPageWithDefaultTransition<void>(context: context, state: state, child: ElectionDashboard(id: state.params['electionId']!, userId: state.params['userId']!)),
           routes: <GoRoute>[
             // Voting
             GoRoute(
                 path: 'voting',
                 builder: (BuildContext context, GoRouterState state) {
                   return Voting(
-                      id: state.params['invitationId']!,
+                      id: state.params['electionId']!,
                       userId: state.params['userId']!);
                 },
                 routes: [
@@ -72,7 +65,7 @@ GoRouter appRouter = GoRouter(
                     path: 'voting-casted',
                     builder: (BuildContext context, GoRouterState state) {
                       return VotingCasted(
-                          id: state.params['invitationId']!,
+                          id: state.params['electionId']!,
                           userId: state.params['userId']!);
                     },
                   )
@@ -82,7 +75,7 @@ GoRouter appRouter = GoRouter(
               path: 'result',
               builder: (BuildContext context, GoRouterState state) {
                 return Result(
-                    id: state.params['invitationId']!,
+                    id: state.params['electionId']!,
                     userId: state.params['userId']!);
               },
             ),
@@ -91,37 +84,41 @@ GoRouter appRouter = GoRouter(
                 path: 'info/:choiceId',
                 builder: (BuildContext context, GoRouterState state) {
                   return ChoiceInfo(
-                      id: state.params['invitationId']!,
+                      id: state.params['electionId']!,
                       userId: state.params['userId']!,
                       title: state.params['choiceId']!);
                 })
           ],
         ),
-        // Register to an organization
+        // Register to an organisation
         GoRoute(
           path: 'register-organization',
           builder: (BuildContext context, GoRouterState state) {
             return const JoinMethod(isElection: false);
           },
           routes: [
+            // confirmation check to join an organisation
             GoRoute(
-                path: 'confirmation/:inputCode',
+                path: 'confirmation/:electionId',
                 builder: (BuildContext context, GoRouterState state) {
                   return JoinConfirmation(
-                      isElection: false, inputCode: state.params['inputCode']!);
+                      isElection: false,
+                      electionId: state.params['electionId']!);
                 },
                 routes: [
+                  // confirmed page when organisation is successfully joined
                   GoRoute(
-                    path: 'confirmed/:invitationId',
+                    path: 'confirmed/:electionId',
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: false,
-                        identifier: state.params['invitationId']!,
+                        identifier: state.params['electionId']!,
                       );
                     },
                   ),
                 ]),
             GoRoute(
+              // scan qr from camera page when joining an organisation
               path: 'camera',
               builder: (BuildContext context, GoRouterState state) {
                 return const JoinCamera(isElection: false);
@@ -136,24 +133,28 @@ GoRouter appRouter = GoRouter(
             return const JoinMethod(isElection: true);
           },
           routes: [
+            // confirmation check to join an election
             GoRoute(
-                path: 'confirmation/:inputCode',
+                path: 'confirmation/:electionId',
                 builder: (BuildContext context, GoRouterState state) {
                   return JoinConfirmation(
-                      isElection: true, inputCode: state.params['inputCode']!);
+                      isElection: true,
+                      electionId: state.params['electionId']!);
                 },
                 routes: [
+                  // confirmed page when election is successfully joined
                   GoRoute(
-                    path: 'confirmed/:invitationId',
+                    path: 'confirmed/:electionId',
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: true,
-                        identifier: state.params['invitationId']!,
+                        identifier: state.params['electionId']!,
                       );
                     },
                   ),
                 ]),
             GoRoute(
+              // scan qr from camera page when joining an election
               path: 'camera',
               builder: (BuildContext context, GoRouterState state) {
                 return const JoinCamera(
@@ -167,12 +168,13 @@ GoRouter appRouter = GoRouter(
           path: 'no-data',
           builder: (context, state) => const join_confirmation.NoDataWidget(),
         ),
-        // View joined organizations
+        // View joined organisations
         GoRoute(
           path: 'joined-organization',
           builder: (BuildContext context, GoRouterState state) {
             return const JoinedOrganizationList();
           },
+          // view specific organisation page: widget yet to be implemented
           routes: [
             GoRoute(
               path: 'view/:organizationId',

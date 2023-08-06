@@ -1,10 +1,8 @@
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/organization_model.dart';
-import 'package:ecclesia_ui/server/bloc/logged_user_bloc.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 // This screen is to list out the current joined organizations.
 

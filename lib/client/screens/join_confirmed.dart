@@ -230,6 +230,7 @@ class JoinElectionPending extends StatelessWidget {
                         )),
                   ),
                   const SizedBox(height: 10),
+                  //DO WE WANT?
                   // const Text(
                   //   'We will send you an email to notify if you have been successfully registered',
                   //   textAlign: TextAlign.center,
@@ -243,19 +244,6 @@ class JoinElectionPending extends StatelessWidget {
         });
   }
 }
-
-// const storage = FlutterSecureStorage();
-// final publicKey = await storage.read(key: 'publicKey');
-// final jsonData = jsonEncode({'pk': publicKey});
-
-// try {
-//   final response = await http.post(
-//     Uri.parse(
-//         'http://localhost:8080/register-organization'),
-//     headers: {'Content-Type': 'application/json'},
-//     body: jsonData,
-//   );
-//   if (response.statusCode == 200) {
 
 class NoDataWidget extends StatelessWidget {
   const NoDataWidget({super.key});

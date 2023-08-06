@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
+  //DO WE WANT: debugging error prints?
+  //not wanted on frontend, shouldn't rly technically be there here but its also not done so theres a case to be made for either idk
   WidgetsFlutterBinding.ensureInitialized();
   checkAndFetchKeys().then((_) {
     runApp(MultiBlocProvider(providers: [
@@ -48,7 +50,6 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
       ),
       routerConfig: appRouter,
-      // home: const Home()
     );
   }
 }

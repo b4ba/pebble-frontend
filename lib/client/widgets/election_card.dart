@@ -32,7 +32,6 @@ class ElectionCard extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-        // margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
         margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -40,9 +39,9 @@ class ElectionCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
                 color: const Color.fromARGB(255, 0, 0, 0)
-                    .withOpacity(0.14), //color of shadow
-                spreadRadius: 0, //spread radius
-                blurRadius: 10, // blur radius
+                    .withOpacity(0.14), //colour of shadow
+                spreadRadius: 0,
+                blurRadius: 10,
                 offset: const Offset(0, 4)),
           ],
         ),
@@ -77,6 +76,7 @@ class ElectionCard extends StatelessWidget {
                     const TextStyle(fontStyle: FontStyle.italic, fontSize: 12)),
             // Link to see result
             // Render only when vote has been closed
+            // DO WE WANT?
             (status != ElectionStatusEnum.voteClosed)
                 ? Container()
                 : SizedBox(

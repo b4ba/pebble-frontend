@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:ecclesia_ui/client/screens/join_confirmed.dart';
 import 'package:ecclesia_ui/client/widgets/custom_appbar.dart';
 import 'package:ecclesia_ui/client/widgets/custom_drawer.dart';
 import 'package:ecclesia_ui/data/models/choice_model.dart';
@@ -20,10 +19,10 @@ import 'package:intl/intl.dart';
 
 class JoinConfirmation extends StatelessWidget {
   final bool isElection;
-  final String inputCode;
+  final String electionId;
 
   const JoinConfirmation(
-      {Key? key, required this.isElection, required this.inputCode})
+      {Key? key, required this.isElection, required this.electionId})
       : super(key: key);
 
   @override
@@ -45,10 +44,10 @@ class JoinConfirmation extends StatelessWidget {
                 onPressed: () async {
                   if (isElection) {
                     final response = await http.get(Uri.parse(
-                        'http://localhost:8080/api/election/join/$inputCode'));
+                        'http://localhost:8080/api/election/join/$electionId'));
                     if (response.statusCode == 200) {
                       final elecInfoResponse = await http.get(Uri.parse(
-                          'http://localhost:8080/api/election/info/$inputCode'));
+                          'http://localhost:8080/api/election/info/$electionId'));
                       //fetch election data & add election to db
                       final data = jsonDecode(elecInfoResponse.body);
 
@@ -60,7 +59,7 @@ class JoinConfirmation extends StatelessWidget {
                           organization: 'organization',
                           startTime: format.parse((data['castStart'])),
                           endTime: format.parse((data['tallyStart'])),
-                          invitationId: inputCode);
+                          invitationId: electionId);
 
                       List<Choice> choices = data['choices']
                           .map<Choice>((choice) => Choice(
@@ -72,19 +71,10 @@ class JoinConfirmation extends StatelessWidget {
                           .toList();
                       isarService.addElection(elec);
                       for (var choice in choices) {
-                        print(choice);
                         isarService.addChoice(choice);
                       }
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JoinConfirmed(
-                            isElection: true,
-                            identifier: elec.invitationId,
-                          ),
-                        ),
-                      );
-                      // context.go('/register-election/confirmed/$inputCode');
+                      context.go(
+                          '/register-election/confirmed/${elec.invitationId}');
                     } else {
                       print('ERROR JOINING ELECTION');
                       context.go('/');
@@ -96,7 +86,7 @@ class JoinConfirmation extends StatelessWidget {
                     final jsonData = jsonEncode({'pk': publicKey});
 
                     final org = await isarService
-                        .getOrganizationByIdentifier(inputCode);
+                        .getOrganizationByIdentifier(electionId);
                     if (org != null) {
                       try {
                         final response = await http.post(
@@ -104,19 +94,9 @@ class JoinConfirmation extends StatelessWidget {
                           headers: {'Content-Type': 'application/json'},
                           body: jsonData,
                         );
-                        print(response.body);
                         if (response.statusCode == 200) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => JoinConfirmed(
-                                isElection: false,
-                                identifier: org.identifier,
-                              ),
-                            ),
-                          );
-                          // context.go(
-                          //     '/register-organization/confirmation/confirmed');
+                          context.go(
+                              '/register-organization/confirmed/${org.identifier}');
                         } else if (response.statusCode == 400) {
                           if (response.body ==
                               'Public key has already been added') {
@@ -150,7 +130,7 @@ class JoinConfirmation extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  IsarService().deleteOrganization(inputCode);
+                  IsarService().deleteOrganization(electionId);
                   context.pop();
                 },
                 style: ButtonStyle(
@@ -182,9 +162,9 @@ class JoinConfirmation extends StatelessWidget {
                 ]),
             child: isElection
                 ? JoinElectionConfirmation(
-                    inputCode: inputCode,
+                    electionId: electionId,
                   )
-                : JoinOrganizationConfirmation(id: inputCode),
+                : JoinOrganizationConfirmation(id: electionId),
           ),
         ),
       ),
@@ -195,13 +175,13 @@ class JoinConfirmation extends StatelessWidget {
 // Prompt message to confirm from the user of intended election
 // to join
 class JoinElectionConfirmation extends StatelessWidget {
-  final String inputCode;
+  final String electionId;
 
-  JoinElectionConfirmation({super.key, required this.inputCode});
+  const JoinElectionConfirmation({super.key, required this.electionId});
 
   Future<Election> _getElectionToJoin() async {
     final response = await http
-        .get(Uri.parse('http://localhost:8080/api/election/info/$inputCode'));
+        .get(Uri.parse('http://localhost:8080/api/election/info/$electionId'));
     final electionData = jsonDecode(response.body);
 
     if (electionData != null) {
@@ -213,7 +193,7 @@ class JoinElectionConfirmation extends StatelessWidget {
         organization: 'organization',
         startTime: format.parse((electionData['castStart'])),
         endTime: format.parse((electionData['tallyStart'])),
-        invitationId: inputCode,
+        invitationId: electionId,
       );
 
       return elec;
@@ -225,7 +205,7 @@ class JoinElectionConfirmation extends StatelessWidget {
         organization: 'organization',
         startTime: DateTime.now(),
         endTime: DateTime.now(),
-        invitationId: inputCode);
+        invitationId: electionId);
   }
 
   @override

@@ -1,5 +1,6 @@
 import '../data/models/election_model.dart';
 
+// The getElectiontatus helper function takes the start and end time of an election and returns the correct status enum
 ElectionStatusEnum getElectionStatus(DateTime startTime, DateTime endTime) {
   DateTime currentDate = DateTime.now();
   if (currentDate.isBefore(startTime)) {

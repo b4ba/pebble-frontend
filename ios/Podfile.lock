@@ -71,6 +71,8 @@ PODS:
     - FlutterMacOS
   - PromisesObjC (2.2.0)
   - Protobuf (3.23.3)
+  - scan (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - cryptography_flutter (from `.symlinks/plugins/cryptography_flutter/ios`)
@@ -80,6 +82,7 @@ DEPENDENCIES:
   - isar_flutter_libs (from `.symlinks/plugins/isar_flutter_libs/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - scan (from `.symlinks/plugins/scan/ios`)
 
 SPEC REPOS:
   trunk:
@@ -112,6 +115,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/mobile_scanner/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  scan:
+    :path: ".symlinks/plugins/scan/ios"
 
 SPEC CHECKSUMS:
   cryptography_flutter: 381bdacc984abcfbe3ca45ef7c76566ff061614c
@@ -134,6 +139,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   Protobuf: d9c3d7e5a3574aa6a5d521f2d9f733c76d294be8
+  scan: aea35bb4aa59ccc8839c576a18cd57c7d492cc86
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
