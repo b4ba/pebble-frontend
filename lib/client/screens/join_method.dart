@@ -151,17 +151,6 @@ class _JoinMethodState extends State<JoinMethod> {
                                   // if (widget.isElection) {
                                   context.go(
                                       '/register-election/confirmation/$inputCode');
-                                  // } else {
-                                  //   Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //       builder: (context) => JoinConfirmed(
-                                  //         isElection: false,
-                                  //         invitationId: inputCode,
-                                  //       ),
-                                  //     ),
-                                  //   );
-                                  // }
                                 },
                                 child: const Text('Register'),
                               )
@@ -243,16 +232,6 @@ class _JoinMethodState extends State<JoinMethod> {
             Future.delayed(const Duration(seconds: 3), () {
               context.go('/register-election/confirmation/$invitationID');
             });
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => JoinConfirmed(
-            //       isElection: false,
-            //       identifier: inputCode,
-            //     ),
-            //   ),
-            // );
-            // context.go('/register-organization/confirmed');
           } else {
             context.go('/no-data');
           }
