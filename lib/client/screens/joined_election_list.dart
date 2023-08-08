@@ -19,61 +19,61 @@ class JoinedElectionList extends StatefulWidget {
 }
 
 class _JoinedElectionListState extends State<JoinedElectionList> {
-  IsarService isarService = IsarService();
+  List<Election> allElections = [];
+  List<Election> activeElections = [];
+  List<Election> endedElections = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchElections();
+  }
+
+  _fetchElections() async {
+    IsarService isarService = IsarService();
+    allElections = await isarService.getAllElections();
+    activeElections = allElections
+        .where((election) =>
+            getElectionStatus(election.startTime, election.endTime) !=
+            ElectionStatusEnum.voteClosed)
+        .toList();
+    endedElections = allElections
+        .where((election) =>
+            getElectionStatus(election.startTime, election.endTime) ==
+            ElectionStatusEnum.voteClosed)
+        .toList();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Election>>(
-        stream: isarService.electionsStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(); // or some other loading widget
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No elections available.'));
-          }
-
-          List<Election> allElections = snapshot.data!;
-          List<Election> activeElections = allElections
-              .where((election) =>
-                  getElectionStatus(election.startTime, election.endTime) !=
-                  ElectionStatusEnum.voteClosed)
-              .toList();
-          List<Election> endedElections = allElections
-              .where((election) =>
-                  getElectionStatus(election.startTime, election.endTime) ==
-                  ElectionStatusEnum.voteClosed)
-              .toList();
-
-          return WillPopScope(
-              onWillPop: null,
+    return WillPopScope(
+        onWillPop: null,
+        child: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 246, 248, 250),
+            appBar: const CustomAppBar(
+                back: false, disableBackGuard: false, disableMenu: false),
+            endDrawer: const CustomDrawer(),
+            body: DefaultTabController(
+              length: 2,
               child: Scaffold(
-                  backgroundColor: const Color.fromARGB(255, 246, 248, 250),
-                  appBar: const CustomAppBar(
-                      back: false, disableBackGuard: false, disableMenu: false),
-                  endDrawer: const CustomDrawer(),
-                  body: DefaultTabController(
-                    length: 2,
-                    child: Scaffold(
-                      appBar: AppBar(
-                        title: const Text('Joined Elections'),
-                        bottom: const TabBar(
-                          tabs: [
-                            Tab(text: 'Active Elections'),
-                            Tab(text: 'Ended Elections'),
-                          ],
-                        ),
-                      ),
-                      body: TabBarView(
-                        children: [
-                          _buildElectionList(activeElections),
-                          _buildElectionList(endedElections),
-                        ],
-                      ),
-                    ),
-                  )));
-        });
+                appBar: AppBar(
+                  title: const Text('Joined Elections'),
+                  bottom: const TabBar(
+                    tabs: [
+                      Tab(text: 'Active Elections'),
+                      Tab(text: 'Ended Elections'),
+                    ],
+                  ),
+                ),
+                body: TabBarView(
+                  children: [
+                    _buildElectionList(activeElections),
+                    _buildElectionList(endedElections),
+                  ],
+                ),
+              ),
+            )));
   }
 
   Widget _buildElectionList(List<Election> elections) {
@@ -92,7 +92,9 @@ class _JoinedElectionListState extends State<JoinedElectionList> {
             status: getElectionStatus(election.startTime, election.endTime),
             userId: '1',
           );
-        });
+        }
+        // ... other attributes and widgets ...
+        );
   }
 }
 // class JoinedElectionList extends StatelessWidget {
