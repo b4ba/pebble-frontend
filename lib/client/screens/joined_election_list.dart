@@ -6,10 +6,6 @@ import 'package:ecclesia_ui/data/models/voter_model.dart';
 import 'package:ecclesia_ui/services/get_election_status.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../server/bloc/election_just_ended_bloc.dart';
-import '../../server/bloc/joined_elections_bloc.dart';
 
 // The 'Joined election list' screen functions as the app's home screen
 // It lists the user's currently active and expired joined elections.
@@ -23,30 +19,13 @@ class JoinedElectionList extends StatefulWidget {
 }
 
 class _JoinedElectionListState extends State<JoinedElectionList> {
-  List<Election> allElections = [];
-  List<Election> activeElections = [];
-  List<Election> endedElections = [];
+  late Stream<List<Election>> electionsStream;
 
   @override
   void initState() {
     super.initState();
-    _loadElections();
-  }
-
-  void _loadElections() async {
     IsarService isarService = IsarService();
-    allElections = await isarService.getAllElections();
-    activeElections = allElections
-        .where((election) =>
-            getElectionStatus(election.startTime, election.endTime) !=
-            ElectionStatusEnum.voteClosed)
-        .toList();
-    endedElections = allElections
-        .where((election) =>
-            getElectionStatus(election.startTime, election.endTime) ==
-            ElectionStatusEnum.voteClosed)
-        .toList();
-    setState(() {});
+    electionsStream = isarService.listenToElections();
   }
 
   @override
@@ -70,11 +49,37 @@ class _JoinedElectionListState extends State<JoinedElectionList> {
                       ],
                     ),
                   ),
-                  body: TabBarView(
-                    children: [
-                      _buildElectionList(activeElections),
-                      _buildElectionList(endedElections),
-                    ],
+                  body: StreamBuilder<List<Election>>(
+                    stream: electionsStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Text('Error fetching election data');
+                      } else if (snapshot.hasData) {
+                        final allElections = snapshot.data!;
+                        final activeElections = allElections
+                            .where((election) =>
+                                getElectionStatus(
+                                    election.startTime, election.endTime) !=
+                                ElectionStatusEnum.voteClosed)
+                            .toList();
+                        final endedElections = allElections
+                            .where((election) =>
+                                getElectionStatus(
+                                    election.startTime, election.endTime) ==
+                                ElectionStatusEnum.voteClosed)
+                            .toList();
+
+                        return TabBarView(
+                          children: [
+                            _buildElectionList(activeElections),
+                            _buildElectionList(endedElections),
+                          ],
+                        );
+                      }
+                      return const Text('No elections available.');
+                    },
                   )),
             )));
   }
@@ -95,9 +100,7 @@ class _JoinedElectionListState extends State<JoinedElectionList> {
             status: getElectionStatus(election.startTime, election.endTime),
             userId: '1',
           );
-        }
-        // ... other attributes and widgets ...
-        );
+        });
   }
 }
 // class JoinedElectionList extends StatelessWidget {

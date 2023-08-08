@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:ecclesia_ui/data/models/organization_model.dart';
@@ -9,6 +11,33 @@ class IsarService {
 
   IsarService() {
     db = openDB();
+  }
+
+  final _electionsController = StreamController<List<Election>>.broadcast();
+
+  // Stream<List<Election>> listenToElections() {
+  //   // Listen for changes in the elections box and add them to the stream
+  //   Isar.instance.elections.watch().listen((event) {
+  //     final elections = Isar.instance.elections.where().findAllSync();
+  //     _electionsController.add(elections);
+  //   });
+  //   return _electionsController.stream;
+  // }
+
+  Stream<List<Election>> listenToElections() async* {
+    _loadInitialElections();
+    final isar = await db;
+    isar.elections.where().watch().listen((event) {
+      final elections = isar.elections.where().findAllSync();
+      _electionsController.add(elections);
+    });
+    yield* _electionsController.stream;
+  }
+
+  void _loadInitialElections() async {
+    final isar = await db;
+    final initialElections = await isar.elections.where().findAll();
+    _electionsController.add(initialElections);
   }
 
   Future<Election?> getElectionByInvitationId(String invId) async {
@@ -49,12 +78,6 @@ class IsarService {
   Future<List<Organization>> getAllOrganizations() async {
     final isar = await db;
     return await isar.organizations.where().findAll();
-  }
-
-  Stream<List<Election>> listenToElections() async* {
-    final isar = await db;
-    yield* isar.elections.where().watch();
-    // initialReturn: true
   }
 
   Future<List<Choice>> getChoicesFor(String invitationKey) async {
