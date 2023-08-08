@@ -97,26 +97,23 @@ GoRouter appRouter = GoRouter(
             return const JoinMethod(isElection: false);
           },
           routes: [
-            // confirmation check to join an organisation
             GoRoute(
-                path: 'confirmation/:organizationId',
-                builder: (BuildContext context, GoRouterState state) {
-                  return JoinConfirmation(
-                      isElection: false,
-                      electionId: state.params['organizationId']!);
-                },
-                routes: [
-                  // confirmed page when organisation is successfully joined
-                  GoRoute(
-                    path: 'confirmed/:inputCode',
-                    builder: (BuildContext context, GoRouterState state) {
-                      return JoinConfirmed(
-                        isElection: false,
-                        identifier: state.params['inputCode']!,
-                      );
-                    },
-                  ),
-                ]),
+              path: 'confirmation/:organizationId',
+              builder: (BuildContext context, GoRouterState state) {
+                return JoinConfirmation(
+                    isElection: false,
+                    electionId: state.params['organizationId']!);
+              },
+            ),
+            GoRoute(
+              path: 'confirmed/:inputCode',
+              builder: (BuildContext context, GoRouterState state) {
+                return JoinConfirmed(
+                  isElection: false,
+                  identifier: state.params['inputCode']!,
+                );
+              },
+            ),
             GoRoute(
               // scan qr from camera page when joining an organisation
               path: 'camera',
@@ -133,26 +130,22 @@ GoRouter appRouter = GoRouter(
             return const JoinMethod(isElection: true);
           },
           routes: [
-            // confirmation check to join an election
             GoRoute(
-                path: 'confirmation/:electionId',
-                builder: (BuildContext context, GoRouterState state) {
-                  return JoinConfirmation(
-                      isElection: true,
-                      electionId: state.params['electionId']!);
-                },
-                routes: [
-                  // confirmed page when election is successfully joined
-                  GoRoute(
-                    path: 'confirmed/:inputCode',
-                    builder: (BuildContext context, GoRouterState state) {
-                      return JoinConfirmed(
-                        isElection: true,
-                        identifier: state.params['inputCode']!,
-                      );
-                    },
-                  ),
-                ]),
+              path: 'confirmation/:electionId',
+              builder: (BuildContext context, GoRouterState state) {
+                return JoinConfirmation(
+                    isElection: true, electionId: state.params['electionId']!);
+              },
+            ),
+            GoRoute(
+              path: 'confirmed/:inputCode',
+              builder: (BuildContext context, GoRouterState state) {
+                return JoinConfirmed(
+                  isElection: true,
+                  identifier: state.params['inputCode']!,
+                );
+              },
+            ),
             GoRoute(
               // scan qr from camera page when joining an election
               path: 'camera',
