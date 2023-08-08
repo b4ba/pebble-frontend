@@ -6,6 +6,10 @@ import 'package:ecclesia_ui/data/models/voter_model.dart';
 import 'package:ecclesia_ui/services/get_election_status.dart';
 import 'package:ecclesia_ui/services/isar_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../server/bloc/election_just_ended_bloc.dart';
+import '../../server/bloc/joined_elections_bloc.dart';
 
 // The 'Joined election list' screen functions as the app's home screen
 // It lists the user's currently active and expired joined elections.
@@ -26,10 +30,10 @@ class _JoinedElectionListState extends State<JoinedElectionList> {
   @override
   void initState() {
     super.initState();
-    _fetchElections();
+    _loadElections();
   }
 
-  _fetchElections() async {
+  void _loadElections() async {
     IsarService isarService = IsarService();
     allElections = await isarService.getAllElections();
     activeElections = allElections
@@ -57,22 +61,21 @@ class _JoinedElectionListState extends State<JoinedElectionList> {
             body: DefaultTabController(
               length: 2,
               child: Scaffold(
-                appBar: AppBar(
-                  title: const Text('Joined Elections'),
-                  bottom: const TabBar(
-                    tabs: [
-                      Tab(text: 'Active Elections'),
-                      Tab(text: 'Ended Elections'),
-                    ],
+                  appBar: AppBar(
+                    title: const Text('Joined Elections'),
+                    bottom: const TabBar(
+                      tabs: [
+                        Tab(text: 'Active Elections'),
+                        Tab(text: 'Ended Elections'),
+                      ],
+                    ),
                   ),
-                ),
-                body: TabBarView(
-                  children: [
-                    _buildElectionList(activeElections),
-                    _buildElectionList(endedElections),
-                  ],
-                ),
-              ),
+                  body: TabBarView(
+                    children: [
+                      _buildElectionList(activeElections),
+                      _buildElectionList(endedElections),
+                    ],
+                  )),
             )));
   }
 
@@ -338,34 +341,6 @@ class _JoinedElectionListState extends State<JoinedElectionList> {
 //     );
 //   }
 // }
-
-class JustEndedElectionTab extends StatelessWidget {
-  final Voter user;
-
-  const JustEndedElectionTab({required this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    // Your existing content for just ended elections
-    // ... BlocBuilder for ElectionJustEndedBloc ...
-    // ... Return widgets for the just ended elections ...
-    return Text('yo');
-  }
-}
-
-class ActiveJoinedElectionTab extends StatelessWidget {
-  final Voter user;
-
-  const ActiveJoinedElectionTab({required this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    // Your existing content for active joined elections
-    // ... BlocBuilder for JoinedElectionsBloc ...
-    // ... Return widgets for the active joined elections ...
-    return Text('ye');
-  }
-}
 
 // Widget to search election
 // DEV NOTE: Not implemented yet

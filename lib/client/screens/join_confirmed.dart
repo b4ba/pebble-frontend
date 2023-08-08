@@ -53,7 +53,6 @@ class _JoinConfirmedState extends State<JoinConfirmed> {
                   ElevatedButton(
                     onPressed: () {
                       context.go('/');
-                      // debugPrint("Going to election detail with id ");
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(Colors.black),
