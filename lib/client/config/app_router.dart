@@ -99,20 +99,20 @@ GoRouter appRouter = GoRouter(
           routes: [
             // confirmation check to join an organisation
             GoRoute(
-                path: 'confirmation/:electionId',
+                path: 'confirmation/:organizationId',
                 builder: (BuildContext context, GoRouterState state) {
                   return JoinConfirmation(
                       isElection: false,
-                      electionId: state.params['electionId']!);
+                      electionId: state.params['organizationId']!);
                 },
                 routes: [
                   // confirmed page when organisation is successfully joined
                   GoRoute(
-                    path: 'confirmed/:electionId',
+                    path: 'confirmed/:inputCode',
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: false,
-                        identifier: state.params['electionId']!,
+                        identifier: state.params['inputCode']!,
                       );
                     },
                   ),
@@ -144,11 +144,11 @@ GoRouter appRouter = GoRouter(
                 routes: [
                   // confirmed page when election is successfully joined
                   GoRoute(
-                    path: 'confirmed/:electionId',
+                    path: 'confirmed/:inputCode',
                     builder: (BuildContext context, GoRouterState state) {
                       return JoinConfirmed(
                         isElection: true,
-                        identifier: state.params['electionId']!,
+                        identifier: state.params['inputCode']!,
                       );
                     },
                   ),

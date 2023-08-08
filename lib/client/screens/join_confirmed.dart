@@ -10,7 +10,6 @@ import '../../services/isar_services.dart';
 
 // Screen to show the status of the user's registeration to an
 // organization/election
-// DEV NOTE: At the moment it is hard-coded
 
 class JoinConfirmed extends StatefulWidget {
   final bool isElection;

@@ -227,16 +227,15 @@ class _JoinMethodState extends State<JoinMethod> {
           final data = jsonDecode(qrText);
           if (data.containsKey('invitationID')) {
             // Extract the invitationID
-            String invitationID = data['invitationID'];
+            String inputCode = data['invitationID'];
             // Proceed with registering for an invitation
             Future.delayed(const Duration(seconds: 3), () {
-              context.go('/register-election/confirmation/$invitationID');
+              context.go('/register-election/confirmation/$inputCode');
             });
           } else {
             context.go('/no-data');
           }
         } else {
-          // org time
           final organization = Organization.fromJson(qrText);
           try {
             IsarService().addOrganization(organization);
@@ -251,10 +250,8 @@ class _JoinMethodState extends State<JoinMethod> {
                 ..add(
                     LoadJoinedOrganizationsEvent(organization: organization)));
           // Proceed with registering for an invitation
-          // Future.delayed(const Duration(seconds: 3), () {
           context.go(
               '/register-organization/confirmation/${organization.identifier}');
-          // });
         }
       } else {
         print('QR is null!');
