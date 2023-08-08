@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ecclesia_ui/data/models/choice_model.dart';
 import 'package:ecclesia_ui/data/models/election_model.dart';
 import 'package:ecclesia_ui/data/models/organization_model.dart';
@@ -6,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 
 class IsarService {
   late Future<Isar> db;
+  final _electionsController = StreamController<List<Election>>.broadcast();
+  Stream<List<Election>> get electionsStream => _electionsController.stream;
 
   IsarService() {
     db = openDB();
@@ -19,6 +23,8 @@ class IsarService {
   Future<void> addElection(Election election) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.elections.putSync(election));
+    final allElections = await getAllElections();
+    _electionsController.add(allElections);
   }
 
   Future<void> addChoice(Choice choice) async {
