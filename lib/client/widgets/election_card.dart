@@ -76,7 +76,7 @@ class ElectionCard extends StatelessWidget {
                     const TextStyle(fontStyle: FontStyle.italic, fontSize: 12)),
             // Link to see result
             // Render only when vote has been closed
-            // DO WE WANT?
+            // DO WE WANT? --> Currently is only a placeholder
             (status != ElectionStatusEnum.voteClosed)
                 ? Container()
                 : SizedBox(
