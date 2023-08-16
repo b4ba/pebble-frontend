@@ -2,9 +2,9 @@
 
 This is a project for a mobile client that interacts with the [E-cclesia e-voting protocol](https://www.pebble.vote/). The client is developed using [Flutter](https://flutter.dev/) and [BLoC](https://bloclibrary.dev/#/) as the state management.
 
-## State of project
+## State of the project
 
-At the moment, the UI is not connected with the backend. To connect it, you should understand how to use BLoC because it is the state management that has been setup. Currently dummy data is being populated in the UI.
+At the moment, the UI is partially connected with the [backend](https://github.com/b4ba/pebble-voting-app/tree/web-client-baba). To further develop the project, you should understand how to use BLoC since it is the state management that has been set up. Currently, for operations that do not relate to the Setup and Credential Generation phases of the protocol, dummy data is being populated in the UI.
 
 ## How to start the project
 
@@ -25,7 +25,7 @@ flutter pub get
 flutter run
 ```
 
-If flutter has a problem, run:
+If flutter has a problem, run the following:
 
 ```
 flutter doctor
